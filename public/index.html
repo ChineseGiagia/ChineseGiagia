@@ -3,353 +3,337 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>数据管理 · Givera</title>
+<title>Givera嘉雅科技 - 官方网站 | 智能时钟 GC-2026</title>
+<meta name="description" content="Givera嘉雅科技官方网站，专注于嵌入式智能硬件研发。我们提供智能时钟GC-2026等产品，拥有自主研发团队。了解嘉雅科技的最新动态、产品参数与联系方式。">
+<meta name="keywords" content="Givera,嘉雅科技,Givera嘉雅科技,智能时钟,GC-2026,嵌入式,智能硬件,ESP32">
+<meta name="author" content="Givera 嘉雅科技">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://givera.qzz.io/">
+<meta property="og:title" content="Givera嘉雅科技 - 官方网站">
+<meta property="og:description" content="专注于嵌入式智能硬件研发，主打产品智能时钟GC-2026。">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://givera.qzz.io/">
+<meta property="og:image" content="https://givera.qzz.io/logo.jpg">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "name": "Givera 嘉雅科技",
+  "alternateName": "嘉雅科技",
+  "url": "https://givera.qzz.io",
+  "logo": "https://givera.qzz.io/logo.jpg",
+  "description": "Givera嘉雅科技是一支专注于嵌入式智能硬件研发的团队，主打产品智能时钟GC-2026。",
+  "email": "Givera@givera.qzz.io",
+  "foundingDate": "2026"
+}
+</script>
 <style>
-* { box-sizing: border-box; }
-body { margin:0; padding:30px 20px; font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;
-  background: radial-gradient(ellipse at bottom, #1b2a4e 0%, #0a0e1a 70%); color:#e8eef7; min-height:100vh; }
-.wrap { max-width: 1100px; margin: 0 auto; }
-header { display:flex; justify-content:space-between; align-items:center; gap:16px;
-  margin-bottom:24px; flex-wrap:wrap; }
-h1 { font-weight: normal; letter-spacing: 3px; font-size: 22px; color:#4fc3f7; margin:0; }
-.toolbar { display:flex; gap:12px; align-items:center; flex-wrap:wrap; }
-.search { padding:10px 16px; border-radius:30px; border:1px solid rgba(80,160,255,0.3);
-  background: rgba(10,14,26,0.7); color:#e8eef7; outline:none; min-width:260px;
-  font-size:14px; transition:border 0.2s; }
-.search:focus { border-color:#4fc3f7; }
-.btn { padding:10px 20px; border-radius:30px; border:none; cursor:pointer; font-size:14px;
-  letter-spacing:1px; transition: transform 0.15s; font-family:inherit; }
-.btn:hover { transform: scale(1.03); }
-.btn-primary { background: linear-gradient(135deg,#4fc3f7,#7c9cff); color:#0a0e1a;
-  font-weight:bold; box-shadow: 0 0 20px rgba(80,160,255,0.35); }
-.btn-ghost { background: transparent; color:#7c9cff; border:1px solid rgba(80,160,255,0.4); }
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+  background: #0a0e1a;
+  color: #e8eef7;
+  overflow-x: hidden;
+  min-height: 100vh;
+}
 
-.card { background: rgba(20,32,56,0.75); border:1px solid rgba(80,160,255,0.2);
-  border-radius: 16px; padding: 8px; backdrop-filter: blur(10px); overflow:hidden; }
+.stars {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: radial-gradient(ellipse at bottom, #1b2a4e 0%, #0a0e1a 70%);
+  z-index: -2;
+}
+.star {
+  position: absolute;
+  background: #fff;
+  border-radius: 50%;
+  animation: twinkle 3s infinite;
+}
+@keyframes twinkle {
+  0%, 100% { opacity: 0.2; }
+  50% { opacity: 1; }
+}
 
-table { width:100%; border-collapse: collapse; }
-th, td { padding:14px 16px; text-align:left; font-size:14px; vertical-align:middle; }
-th { color:#7a8ba8; font-weight:normal; font-size:13px; letter-spacing:1px;
-  border-bottom:1px solid rgba(80,160,255,0.15); }
-td { border-bottom:1px solid rgba(80,160,255,0.08); }
-tr:last-child td { border-bottom: none; }
-tbody tr:hover td { background: rgba(80,160,255,0.05); }
-tbody tr.match td { background: rgba(80,160,255,0.08); }
+.container {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 60px 20px 40px;
+}
 
-.thumb { width:48px; height:48px; object-fit:cover; border-radius:8px;
-  background: rgba(10,14,26,0.6); border:1px solid rgba(80,160,255,0.2); display:block; }
-.thumb.placeholder { background: rgba(10,14,26,0.6); }
-.empty { text-align:center; padding:40px; color:#7a8ba8; font-size:14px; }
-.name-cell { color:#e8eef7; font-weight:500; }
-.desc-cell { color:#b8c6dc; max-width: 420px; word-break: break-word; }
+.logo-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 30px;
+  animation: fadeIn 0.8s ease;
+}
+.logo-img {
+  width: 140px;
+  height: 112px;
+  object-fit: contain;
+  border-radius: 16px;
+  background: #111a2e;
+  padding: 10px;
+  box-shadow: 0 0 40px rgba(80, 160, 255, 0.35);
+  animation: float 4s ease-in-out infinite;
+}
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-10px); }
+}
+.company-name {
+  margin-top: 18px;
+  font-size: 26px;
+  font-weight: normal;
+  letter-spacing: 4px;
+  background: linear-gradient(90deg, #4fc3f7, #7c9cff, #4fc3f7);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: shine 3s linear infinite;
+}
+@keyframes shine {
+  to { background-position: 200% center; }
+}
+.slogan {
+  margin-top: 8px;
+  font-size: 14px;
+  color: #7a8ba8;
+  letter-spacing: 2px;
+}
 
-mark { background: rgba(80,200,255,0.35); color:#e8eef7; padding:0 2px; border-radius:3px; }
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
 
-.row-actions { display:flex; gap:8px; }
-.mini { padding:6px 14px; font-size:13px; border-radius:20px; border:none; cursor:pointer;
-  font-family:inherit; transition: all 0.2s; }
-.mini-edit { background: rgba(80,160,255,0.15); color:#4fc3f7; border:1px solid rgba(80,160,255,0.3); }
-.mini-edit:hover { background: rgba(80,160,255,0.3); }
-.mini-del { background: rgba(255,80,80,0.1); color:#ff8f8f; border:1px solid rgba(255,80,80,0.3); }
-.mini-del:hover { background: rgba(255,80,80,0.25); }
+.team-card {
+  margin-top: 40px;
+  background: rgba(20, 32, 56, 0.7);
+  border: 1px solid rgba(80, 160, 255, 0.2);
+  border-radius: 20px;
+  padding: 32px;
+  backdrop-filter: blur(10px);
+  animation: fadeIn 0.9s ease;
+}
+.team-title {
+  font-size: 20px;
+  color: #4fc3f7;
+  margin-bottom: 16px;
+  letter-spacing: 2px;
+}
+.team-desc {
+  font-size: 15px;
+  line-height: 1.9;
+  color: #b8c6dc;
+}
+.team-stats {
+  margin-top: 24px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 16px;
+}
+.stat {
+  text-align: center;
+  padding: 18px 12px;
+  background: rgba(30, 48, 80, 0.6);
+  border-radius: 14px;
+  border: 1px solid rgba(80, 160, 255, 0.15);
+  transition: transform 0.3s, border-color 0.3s;
+}
+.stat:hover {
+  transform: translateY(-5px);
+  border-color: rgba(80, 160, 255, 0.5);
+}
+.stat-num {
+  font-size: 24px;
+  font-weight: bold;
+  color: #7c9cff;
+}
+.stat-label {
+  font-size: 12px;
+  color: #7a8ba8;
+  margin-top: 6px;
+  letter-spacing: 1px;
+}
 
-.modal-mask { position: fixed; inset:0; background: rgba(0,0,0,0.7); display:none;
-  align-items:center; justify-content:center; z-index:100; backdrop-filter: blur(4px); padding: 20px; }
-.modal-mask.show { display:flex; }
-.modal { background: #131c30; border:1px solid rgba(80,160,255,0.3); border-radius:18px;
-  width:100%; max-width:520px; padding:28px; box-shadow: 0 0 60px rgba(80,160,255,0.2);
-  max-height: 90vh; overflow-y: auto; }
-.modal h3 { margin:0 0 20px; font-weight:normal; color:#4fc3f7; letter-spacing:2px; font-size:18px; }
-.field { margin-bottom:14px; }
-.field label { display:block; font-size:13px; color:#7a8ba8; margin-bottom:6px; letter-spacing:1px; }
-.field input, .field textarea { width:100%; padding:11px 14px; font-family:inherit; font-size:14px;
-  background: rgba(10,14,26,0.8); border:1px solid rgba(80,160,255,0.25);
-  border-radius:10px; color:#e8eef7; outline:none; transition:border 0.2s; }
-.field input:focus, .field textarea:focus { border-color:#4fc3f7; }
-.field textarea { min-height: 100px; resize: vertical; }
-.field textarea.tall { min-height: 180px; }
-.preview { margin-top:8px; max-width:100%; max-height:140px; border-radius:10px;
-  border:1px solid rgba(80,160,255,0.2); display:none; }
-.preview.show { display:block; }
-.modal-actions { display:flex; gap:10px; justify-content:flex-end; margin-top:22px; }
-.msg { font-size:13px; margin-top:12px; min-height:18px; text-align:right; }
+.contact-row {
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid rgba(80, 160, 255, 0.15);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 24px;
+  font-size: 14px;
+}
+.contact-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.contact-item .icon {
+  color: #4fc3f7;
+  font-size: 16px;
+}
+.contact-item a {
+  color: #b8c6dc;
+  text-decoration: none;
+  transition: color 0.3s;
+}
+.contact-item a:hover {
+  color: #4fc3f7;
+}
 
-@media (max-width: 720px) {
-  .desc-cell { max-width: 160px; }
-  th, td { padding: 10px 8px; font-size: 13px; }
-  .thumb { width:36px; height:36px; }
-  .search { min-width: 0; flex:1; }
+.entry {
+  margin-top: 36px;
+  display: flex;
+  justify-content: center;
+  animation: fadeIn 1s ease;
+}
+.entry-btn {
+  position: relative;
+  padding: 18px 48px;
+  font-size: 17px;
+  letter-spacing: 3px;
+  color: #0a0e1a;
+  background: linear-gradient(135deg, #4fc3f7, #7c9cff);
+  border: none;
+  border-radius: 50px;
+  cursor: pointer;
+  font-weight: bold;
+  overflow: hidden;
+  transition: transform 0.3s, box-shadow 0.3s;
+  box-shadow: 0 0 30px rgba(80, 160, 255, 0.5);
+}
+.entry-btn:hover {
+  transform: scale(1.06);
+  box-shadow: 0 0 50px rgba(80, 160, 255, 0.8);
+}
+.entry-btn::after {
+  content: "";
+  position: absolute;
+  top: 0; left: -100%;
+  width: 100%; height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+  animation: sweep 2.5s infinite;
+}
+@keyframes sweep {
+  to { left: 100%; }
+}
+
+footer {
+  text-align: center;
+  padding: 40px 20px 20px;
+  font-size: 12px;
+  color: #4a5878;
+  letter-spacing: 1px;
+}
+footer a {
+  color: #4a5878;
+  text-decoration: none;
+  transition: color 0.3s;
+}
+footer a:hover {
+  color: #4fc3f7;
+}
+
+@media (max-width: 600px) {
+  .company-name { font-size: 20px; }
+  .team-card { padding: 20px; }
+  .contact-row { font-size: 13px; }
+  .container { padding: 40px 16px 20px; }
 }
 </style>
 </head>
 <body>
-  <div class="wrap">
-    <header>
-      <h1>数据管理面板</h1>
-      <div class="toolbar">
-        <input class="search" id="search" placeholder="搜索名称或描述…">
-        <button class="btn btn-primary" id="addBtn">+ 添加项目</button>
-        <button class="btn btn-ghost" id="logout">退出</button>
-      </div>
-    </header>
 
-    <div class="card">
-      <table>
-        <thead>
-          <tr>
-            <th style="width:70px">图片</th>
-            <th style="width:26%">名称</th>
-            <th>描述</th>
-            <th style="width:170px">操作</th>
-          </tr>
-        </thead>
-        <tbody id="tbody">
-          <tr><td colspan="4" class="empty">加载中…</td></tr>
-        </tbody>
-      </table>
+<div class="stars" id="stars"></div>
+
+<a href="/login" style="
+  position: fixed; top: 20px; right: 24px; z-index: 10;
+  padding: 8px 18px; font-size: 13px; letter-spacing: 2px;
+  color: #7c9cff; border: 1px solid rgba(80,160,255,0.4);
+  border-radius: 30px; text-decoration: none;
+  background: rgba(20,32,56,0.6); backdrop-filter: blur(10px);
+  transition: all 0.3s;
+" onmouseover="this.style.background='rgba(80,160,255,0.15)';this.style.borderColor='#7c9cff';"
+   onmouseout="this.style.background='rgba(20,32,56,0.6)';this.style.borderColor='rgba(80,160,255,0.4)';">
+  管理
+</a>
+
+<div class="container">
+
+  <div class="logo-wrap">
+    <img src="logo.jpg" alt="Givera 嘉雅科技 Logo" class="logo-img" onerror="this.style.display='none'">
+    <h1 class="company-name">Givera 嘉雅科技</h1>
+    <div class="slogan">专注于智能硬件 · 让生活更简单</div>
+  </div>
+
+  <div class="team-card">
+    <div class="team-title">关于我们</div>
+    <div class="team-desc">
+      Givera 嘉雅科技是一支专注于嵌入式智能硬件研发的团队。我们致力于将微控制器、传感器、无线通信等技术与日常生活场景结合，
+      打造简洁、实用、有温度的智能设备。从电路设计、固件开发到外观交互，我们坚持自主完成每一个环节，
+      用技术解决身边的小问题。
+    </div>
+
+    <div class="team-stats">
+      <div class="stat">
+        <div class="stat-num">2026</div>
+        <div class="stat-label">成立年份</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">1+</div>
+        <div class="stat-label">在售产品</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">100%</div>
+        <div class="stat-label">自主研发</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">V1.0</div>
+        <div class="stat-label">当前版本</div>
+      </div>
+    </div>
+
+    <div class="contact-row">
+      <div class="contact-item">
+        <span class="icon">✉</span>
+        <a href="mailto:Givera@givera.qzz.io">Givera@givera.qzz.io</a>
+      </div>
+      <div class="contact-item">
+        <span class="icon">🌐</span>
+        <a href="https://givera.qzz.io" target="_blank">givera.qzz.io</a>
+      </div>
     </div>
   </div>
 
-  <div class="modal-mask" id="modal">
-    <div class="modal">
-      <h3 id="modalTitle">添加项目</h3>
-      <input type="hidden" id="itemId">
-      <div class="field">
-        <label>名称</label>
-        <input id="name" placeholder="项目名称">
-      </div>
-      <div class="field">
-        <label>描述（列表页显示）</label>
-        <textarea id="desc" placeholder="一句话简介"></textarea>
-      </div>
-      <div class="field">
-        <label>详细内容（产品详情页显示）</label>
-        <textarea id="content" class="tall" placeholder="可以多段、分点写详细说明"></textarea>
-      </div>
-      <div class="field">
-        <label>图片链接（URL）</label>
-        <input id="image" placeholder="https://…">
-        <img id="preview" class="preview" alt="预览">
-      </div>
-      <div class="msg" id="modalMsg"></div>
-      <div class="modal-actions">
-        <button class="btn btn-ghost" id="cancelBtn">取消</button>
-        <button class="btn btn-primary" id="saveBtn">保存</button>
-      </div>
-    </div>
+  <div class="entry">
+    <button class="entry-btn" onclick="location.href='/products'">查看产品 →</button>
   </div>
+
+  <footer>© 2026 Givera 嘉雅科技 · 保留所有权利</footer>
+</div>
 
 <script>
-const tbody = document.getElementById("tbody");
-const searchInput = document.getElementById("search");
-const modal = document.getElementById("modal");
-const modalTitle = document.getElementById("modalTitle");
-const itemIdEl = document.getElementById("itemId");
-const nameEl = document.getElementById("name");
-const descEl = document.getElementById("desc");
-const contentEl = document.getElementById("content");
-const imageEl = document.getElementById("image");
-const previewEl = document.getElementById("preview");
-const modalMsg = document.getElementById("modalMsg");
-
-let allItems = [];
-
-async function loadItems() {
-  try {
-    const res = await fetch("/api/items?t=" + Date.now(), {
-      cache: "no-store",
-      credentials: "include"
-    });
-    if (res.status === 401) {
-      location.href = "/login";
-      return;
-    }
-    const data = await res.json();
-    allItems = data.items || [];
-    render();
-  } catch (e) {
-    tbody.innerHTML = '<tr><td colspan="4" class="empty">加载失败</td></tr>';
+(function() {
+  const starsEl = document.getElementById('stars');
+  const count = 80;
+  for (let i = 0; i < count; i++) {
+    const s = document.createElement('div');
+    s.className = 'star';
+    const size = Math.random() * 2 + 1;
+    s.style.width = size + 'px';
+    s.style.height = size + 'px';
+    s.style.left = Math.random() * 100 + '%';
+    s.style.top = Math.random() * 100 + '%';
+    s.style.animationDelay = (Math.random() * 3) + 's';
+    starsEl.appendChild(s);
   }
-}
-
-function escapeHtml(s) {
-  return String(s == null ? "" : s).replace(/[&<>"']/g, c => ({
-    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
-  }[c]));
-}
-
-function matchItem(item, query) {
-  if (!query) return true;
-  const q = query.toLowerCase().trim();
-  const name = (item.name || "").toLowerCase();
-  const desc = (item.description || "").toLowerCase();
-  if (name.includes(q) || desc.includes(q)) return true;
-  const terms = q.split(/\s+/).filter(Boolean);
-  if (terms.length > 1) return terms.every(t => name.includes(t) || desc.includes(t));
-  return false;
-}
-
-function highlight(text, query) {
-  const safe = escapeHtml(text || "");
-  if (!query) return safe;
-  const q = query.trim();
-  if (!q) return safe;
-  const esc = q.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-  const re = new RegExp("(" + esc + ")", "gi");
-  return safe.replace(re, "<mark>$1</mark>");
-}
-
-function render() {
-  const q = searchInput.value.trim();
-  const filtered = allItems.filter(it => matchItem(it, q));
-
-  if (!filtered.length) {
-    tbody.innerHTML = `<tr><td colspan="4" class="empty">${
-      q ? "没有匹配的结果" : "还没有数据，点击右上角「添加项目」"
-    }</td></tr>`;
-    return;
-  }
-
-  tbody.innerHTML = filtered.map(it => {
-    const isMatch = q && matchItem(it, q);
-    return `
-    <tr class="${isMatch ? "match" : ""}">
-      <td>
-        ${it.image_url
-          ? `<img class="thumb" src="${escapeHtml(it.image_url)}" alt=""
-               onerror="this.classList.add('placeholder');this.removeAttribute('src')">`
-          : '<div class="thumb placeholder"></div>'}
-      </td>
-      <td class="name-cell">${highlight(it.name, q)}</td>
-      <td class="desc-cell">${highlight(it.description || "", q)}</td>
-      <td>
-        <div class="row-actions">
-          <button class="mini mini-edit" data-edit="${it.id}">编辑</button>
-          <button class="mini mini-del" data-del="${it.id}">删除</button>
-        </div>
-      </td>
-    </tr>`;
-  }).join("");
-}
-
-searchInput.addEventListener("input", render);
-
-tbody.addEventListener("click", async (e) => {
-  const editId = e.target.dataset.edit;
-  const delId = e.target.dataset.del;
-
-  if (editId) {
-    // 从服务器拉取完整信息（含 content 字段）
-    try {
-      const res = await fetch("/api/items/" + editId + "?t=" + Date.now(), {
-        cache: "no-store",
-        credentials: "include"
-      });
-      const it = await res.json();
-      if (it.error) { alert(it.error); return; }
-      openModal(it);
-    } catch {
-      alert("加载失败");
-    }
-  }
-
-  if (delId) {
-    if (!confirm("确定要删除这条记录吗？")) return;
-    const res = await fetch(`/api/items/${delId}?t=` + Date.now(), {
-      method: "DELETE",
-      credentials: "include"
-    });
-    const d = await res.json();
-    if (d.success) loadItems();
-    else alert(d.error || "删除失败");
-  }
-});
-
-function openModal(item) {
-  modalMsg.textContent = "";
-  if (item) {
-    modalTitle.textContent = "编辑项目";
-    itemIdEl.value = item.id;
-    nameEl.value = item.name || "";
-    descEl.value = item.description || "";
-    contentEl.value = item.content || "";
-    imageEl.value = item.image_url || "";
-  } else {
-    modalTitle.textContent = "添加项目";
-    itemIdEl.value = "";
-    nameEl.value = "";
-    descEl.value = "";
-    contentEl.value = "";
-    imageEl.value = "";
-  }
-  updatePreview();
-  modal.classList.add("show");
-  setTimeout(() => nameEl.focus(), 50);
-}
-
-function closeModal() { modal.classList.remove("show"); }
-
-function updatePreview() {
-  const url = imageEl.value.trim();
-  if (url) { previewEl.src = url; previewEl.classList.add("show"); }
-  else { previewEl.classList.remove("show"); previewEl.removeAttribute("src"); }
-}
-
-imageEl.addEventListener("input", updatePreview);
-document.getElementById("addBtn").onclick = () => openModal(null);
-document.getElementById("cancelBtn").onclick = closeModal;
-modal.addEventListener("click", (e) => { if (e.target === modal) closeModal(); });
-
-document.getElementById("saveBtn").onclick = async () => {
-  const id = itemIdEl.value;
-  const body = {
-    name: nameEl.value.trim(),
-    description: descEl.value,
-    content: contentEl.value,
-    image_url: imageEl.value.trim()
-  };
-  if (!body.name) {
-    modalMsg.style.color = "#ff8f8f";
-    modalMsg.textContent = "名称不能为空";
-    return;
-  }
-  modalMsg.style.color = "#7a8ba8";
-  modalMsg.textContent = "保存中…";
-
-  try {
-    const url = id ? `/api/items/${id}?t=` + Date.now() : "/api/items?t=" + Date.now();
-    const method = id ? "PUT" : "POST";
-    const res = await fetch(url, {
-      method,
-      headers: { "Content-Type": "application/json" },
-      credentials: "include",
-      body: JSON.stringify(body)
-    });
-    const text = await res.text();
-    let d;
-    try { d = JSON.parse(text); } catch { d = { error: "服务器返回异常（HTTP " + res.status + "）" }; }
-
-    if (res.ok && d.success) {
-      modalMsg.style.color = "#8affa8";
-      modalMsg.textContent = "✓ 已保存，正在刷新…";
-      closeModal();
-      await loadItems();
-    } else {
-      modalMsg.style.color = "#ff8f8f";
-      modalMsg.textContent = d.error || "保存失败";
-    }
-  } catch (err) {
-    modalMsg.style.color = "#ff8f8f";
-    modalMsg.textContent = "网络错误：" + err.message;
-  }
-};
-
-document.getElementById("logout").onclick = async () => {
-  await fetch("/api/auth/logout", { method: "POST", credentials: "include" });
-  location.href = "/login";
-};
-
-loadItems();
+})();
 </script>
+
 </body>
 </html>
