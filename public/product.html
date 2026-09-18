@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>产品详情 · Givera 嘉雅科技</title>
+<style>
+* { box-sizing: border-box; }
+body { margin:0; padding:40px 20px; font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;
+  background: radial-gradient(ellipse at bottom, #1b2a4e 0%, #0a0e1a 70%); color:#e8eef7; min-height:100vh; }
+.container { max-width: 900px; margin: 0 auto; }
+.back-btn { display:inline-block; padding:8px 20px; font-size:14px; letter-spacing:2px;
+  border-radius:30px; color:#7c9cff; border:1px solid rgba(80,160,255,0.4);
+  background:transparent; text-decoration:none; margin-bottom:30px; transition: all 0.3s; }
+.back-btn:hover { background: rgba(80,160,255,0.15); border-color:#7c9cff; }
+
+.hero { background: rgba(20,32,56,0.75); border:1px solid rgba(80,160,255,0.2);
+  border-radius: 20px; padding: 30px; backdrop-filter: blur(10px); margin-bottom: 24px; }
+.hero-img { width: 100%; max-height: 340px; object-fit: contain; border-radius: 14px;
+  background:#111a2e; padding: 20px; display:block; margin-bottom: 24px; }
+.hero-img.placeholder { display:flex; align-items:center; justify-content:center;
+  color:#4a5878; font-size: 60px; height: 240px; }
+.hero-title { font-size: 28px; letter-spacing: 3px; margin: 0 0 12px;
+  background: linear-gradient(90deg,#4fc3f7,#7c9cff); -webkit-background-clip:text;
+  background-clip:text; color:transparent; font-weight: normal; }
+.hero-sub { font-size: 14px; color:#7a8ba8; letter-spacing: 1px; margin: 0; }
+
+.section { background: rgba(20,32,56,0.75); border:1px solid rgba(80,160,255,0.2);
+  border-radius: 20px; padding: 28px; backdrop-filter: blur(10px); margin-bottom: 24px; }
+.section-title { font-size: 18px; color:#4fc3f7; margin: 0 0 20px; padding-bottom: 12px;
+  border-bottom: 1px solid rgba(80,160,255,0.2); letter-spacing: 2px; font-weight: normal; }
+
+.detail { font-size: 15px; color:#b8c6dc; line-height: 2; white-space: pre-wrap; word-break: break-word; }
+
+.fw-item { display:flex; justify-content:space-between; align-items:center;
+  padding: 14px 18px; background: rgba(30,48,80,0.5); border-radius: 12px;
+  border-left: 3px solid #4fc3f7; margin-bottom: 10px; gap: 16px; flex-wrap: wrap; }
+.fw-info { flex: 1; min-width: 200px; }
+.fw-version { font-size: 15px; color:#e8eef7; font-weight: 500; margin-bottom: 4px; }
+.fw-desc { font-size: 13px; color:#b8c6dc; line-height: 1.6; }
+.fw-meta { font-size: 12px; color:#7a8ba8; margin-top: 4px; }
+.dl-btn { padding: 8px 20px; font-size: 13px; letter-spacing: 1px; border-radius: 30px;
+  background: linear-gradient(135deg,#4fc3f7,#7c9cff); color: #0a0e1a; font-weight: bold;
+  border: none; cursor: pointer; text-decoration: none; transition: transform 0.2s; white-space: nowrap; }
+.dl-btn:hover { transform: scale(1.05); }
+
+.empty { text-align:center; padding: 30px; color: #7a8ba8; font-size: 14px; }
+.loading { text-align:center; padding: 60px; color:#7a8ba8; }
+</style>
+</head>
+<body>
+  <div class="container">
+    <a class="back-btn" href="/products">← 返回产品列表</a>
+    <div id="content"><div class="loading">加载中…</div></div>
+  </div>
+
+<script>
+function escapeHtml(s) {
+  return String(s == null ? "" : s).replace(/[&<>"']/g, c => ({
+    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+  }[c]));
+}
+function formatSize(bytes) {
+  if (!bytes) return "";
+  if (bytes < 1024) return bytes + " B";
+  if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + " KB";
+  return (bytes / 1024 / 1024).toFixed(1) + " MB";
+}
+
+(async () => {
+  const content = document.getElementById("content");
+  const id = new URLSearchParams(location.search).get("id");
+  if (!id) { content.innerHTML = '<div class="loading">缺少产品 ID</div>'; return; }
+
+  try {
+    const [itemRes, fwRes] = await Promise.all([
+      fetch("/api/items/" + id + "?t=" + Date.now(), { cache: "no-store" }),
+      fetch("/api/firmwares?product_id=" + id + "&t=" + Date.now(), { cache: "no-store" })
+    ]);
+    const item = await itemRes.json();
+    const fwData = await fwRes.json().catch(() => ({ firmwares: [] }));
+    const firmwares = fwData.firmwares || [];
+
+    if (item.error) { content.innerHTML = '<div class="loading">产品不存在</div>'; return; }
+
+    document.title = item.name + " · Givera 嘉雅科技";
+
+    const fwList = firmwares.length
+      ? firmwares.map(f => `
+        <div class="fw-item">
+          <div class="fw-info">
+            <div class="fw-version">${escapeHtml(f.version)}</div>
+            <div class="fw-desc">${escapeHtml(f.description || "")}</div>
+            <div class="fw-meta">${escapeHtml(f.file_name)}${f.file_size ? " · " + formatSize(f.file_size) : ""}</div>
+          </div>
+          <a class="dl-btn" href="/firmwares/${encodeURIComponent(f.file_name)}" download>下载固件</a>
+        </div>
+      `).join("")
+      : '<div class="empty">暂无固件发布</div>';
+
+    // 详细内容：优先用 content，没有就用 description 兜底
+    const detailHtml = item.content
+      ? escapeHtml(item.content)
+      : (item.description ? escapeHtml(item.description) : "暂无详细说明");
+
+    content.innerHTML = `
+      <div class="hero">
+        ${item.image_url
+          ? `<img class="hero-img" src="${escapeHtml(item.image_url)}" alt=""
+               onerror="this.outerHTML='<div class=\\'hero-img placeholder\\'>📦</div>'">`
+          : '<div class="hero-img placeholder">📦</div>'}
+        <h1 class="hero-title">${escapeHtml(item.name)}</h1>
+        ${item.description ? `<p class="hero-sub">${escapeHtml(item.description)}</p>` : ""}
+      </div>
+
+      <div class="section">
+        <h2 class="section-title">产品详情</h2>
+        <div class="detail">${detailHtml}</div>
+      </div>
+
+      <div class="section">
+        <h2 class="section-title">固件下载</h2>
+        ${fwList}
+      </div>
+    `;
+  } catch (e) {
+    content.innerHTML = '<div class="loading">加载失败，请刷新重试</div>';
+  }
+})();
+</script>
+</body>
+</html>

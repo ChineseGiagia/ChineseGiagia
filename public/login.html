@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>登录 · Givera 嘉雅科技</title>
+<style>
+  body { margin:0; min-height:100vh; display:flex; align-items:center; justify-content:center;
+    font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;
+    background: radial-gradient(ellipse at bottom, #1b2a4e 0%, #0a0e1a 70%); color:#e8eef7; }
+  .card { width: 100%; max-width: 380px; padding: 40px 32px;
+    background: rgba(20,32,56,0.75); border:1px solid rgba(80,160,255,0.2);
+    border-radius: 20px; backdrop-filter: blur(12px); box-shadow: 0 0 60px rgba(80,160,255,0.15); }
+  h2 { text-align:center; margin:0 0 28px; font-weight: normal; letter-spacing: 3px;
+    background: linear-gradient(90deg,#4fc3f7,#7c9cff); -webkit-background-clip:text;
+    background-clip:text; color:transparent; }
+  label { display:block; font-size:13px; color:#7a8ba8; margin-bottom:8px; letter-spacing:1px; }
+  input { width:100%; padding:12px 14px; margin-bottom:18px; box-sizing:border-box;
+    background: rgba(10,14,26,0.8); border:1px solid rgba(80,160,255,0.25);
+    border-radius: 10px; color:#e8eef7; font-size:14px; outline:none; transition:border-color 0.3s; }
+  input:focus { border-color:#4fc3f7; }
+  .pwd-wrap { position: relative; margin-bottom: 18px; }
+  .pwd-wrap input { margin-bottom: 0; padding-right: 46px; }
+  .eye-btn { position: absolute; top: 50%; right: 8px; transform: translateY(-50%);
+    width: 34px; height: 34px; display:flex; align-items:center; justify-content:center;
+    background: transparent; border: none; cursor: pointer; color:#7a8ba8;
+    border-radius: 8px; transition: color 0.2s, background 0.2s; }
+  .eye-btn:hover { color:#4fc3f7; background: rgba(80,160,255,0.1); }
+  .eye-btn.on { color:#4fc3f7; }
+  .submit-btn { width:100%; padding:13px; margin-top:6px; font-size:15px; letter-spacing:2px;
+    color:#0a0e1a; background: linear-gradient(135deg,#4fc3f7,#7c9cff);
+    border:none; border-radius: 30px; font-weight:bold; cursor:pointer;
+    box-shadow: 0 0 24px rgba(80,160,255,0.45); transition: transform 0.2s; }
+  .submit-btn:hover { transform: scale(1.02); }
+  .links { margin-top:20px; text-align:center; font-size:13px; }
+  .links a { color:#7c9cff; text-decoration:none; margin: 0 8px; }
+  .links a:hover { color:#4fc3f7; }
+  .msg { text-align:center; font-size:13px; margin-top:14px; min-height:18px; color:#ff8f8f; }
+</style>
+</head>
+<body>
+  <form class="card" id="f" autocomplete="off">
+    <h2>登 录</h2>
+    <label>账号</label>
+    <input type="text" name="email" required autocomplete="username" placeholder="邮箱">
+    <label>密码</label>
+    <div class="pwd-wrap">
+      <input type="password" name="password" id="pwd" required autocomplete="current-password">
+      <button type="button" class="eye-btn" id="eye" aria-label="显示密码" title="显示/隐藏密码">
+        <svg id="eyeSvg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+          <circle cx="12" cy="12" r="3"/>
+        </svg>
+      </button>
+    </div>
+    <button type="submit" class="submit-btn">登 录</button>
+    <div class="msg" id="msg"></div>
+    <div class="links">
+      <a href="/register">注册</a> · <a href="/forgot-password">忘记密码</a> · <a href="/">返回首页</a>
+    </div>
+  </form>
+
+<script>
+const pwd = document.getElementById("pwd");
+const eye = document.getElementById("eye");
+const eyeSvg = document.getElementById("eyeSvg");
+eye.addEventListener("click", () => {
+  const show = pwd.type === "password";
+  pwd.type = show ? "text" : "password";
+  eye.classList.toggle("on", show);
+  eyeSvg.innerHTML = show
+    ? `<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/>
+       <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/>
+       <path d="M14.12 14.12a3 3 0 1 1-4.24-4.24"/>
+       <line x1="1" y1="1" x2="23" y2="23"/>`
+    : `<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+       <circle cx="12" cy="12" r="3"/>`;
+});
+document.getElementById("f").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const msg = document.getElementById("msg");
+  msg.textContent = "";
+  const fd = new FormData(e.target);
+  const res = await fetch("/api/auth/login", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email: fd.get("email"), password: fd.get("password") })
+  });
+  const data = await res.json();
+  if (data.success) location.href = data.redirect || "/";
+  else msg.textContent = data.error || "登录失败";
+});
+</script>
+</body>
+</html>

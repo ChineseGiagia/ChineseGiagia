@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>注册 · Givera 嘉雅科技</title>
+<style>
+  body { margin:0; min-height:100vh; display:flex; align-items:center; justify-content:center;
+    font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;
+    background: radial-gradient(ellipse at bottom, #1b2a4e 0%, #0a0e1a 70%); color:#e8eef7; padding: 20px; }
+  .card { width: 100%; max-width: 400px; padding: 40px 32px;
+    background: rgba(20,32,56,0.75); border:1px solid rgba(80,160,255,0.2);
+    border-radius: 20px; backdrop-filter: blur(12px); box-shadow: 0 0 60px rgba(80,160,255,0.15); }
+  h2 { text-align:center; margin:0 0 28px; font-weight: normal; letter-spacing: 3px;
+    background: linear-gradient(90deg,#4fc3f7,#7c9cff); -webkit-background-clip:text;
+    background-clip:text; color:transparent; }
+  label { display:block; font-size:13px; color:#7a8ba8; margin-bottom:8px; letter-spacing:1px; }
+  input { width:100%; padding:12px 14px; margin-bottom:18px; box-sizing:border-box;
+    background: rgba(10,14,26,0.8); border:1px solid rgba(80,160,255,0.25);
+    border-radius: 10px; color:#e8eef7; font-size:14px; outline:none; transition:border-color 0.3s; }
+  input:focus { border-color:#4fc3f7; }
+  .pwd-wrap { position: relative; margin-bottom: 18px; }
+  .pwd-wrap input { margin-bottom: 0; padding-right: 46px; }
+  .eye-btn { position: absolute; top: 50%; right: 8px; transform: translateY(-50%);
+    width: 34px; height: 34px; display:flex; align-items:center; justify-content:center;
+    background: transparent; border: none; cursor: pointer; color:#7a8ba8;
+    border-radius: 8px; transition: color 0.2s, background 0.2s; }
+  .eye-btn:hover { color:#4fc3f7; background: rgba(80,160,255,0.1); }
+  .eye-btn.on { color:#4fc3f7; }
+  .code-row { display:flex; gap:8px; margin-bottom:18px; }
+  .code-row input { flex:1; margin-bottom:0; }
+  .code-btn { padding: 0 16px; font-size:13px; white-space:nowrap; border-radius:10px;
+    border:1px solid rgba(80,160,255,0.4); background: transparent; color:#7c9cff;
+    cursor:pointer; font-family:inherit; transition: all 0.2s; }
+  .code-btn:hover:not(:disabled) { background: rgba(80,160,255,0.15); }
+  .code-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+  button.submit-btn { width:100%; padding:13px; margin-top:6px; font-size:15px; letter-spacing:2px;
+    color:#0a0e1a; background: linear-gradient(135deg,#4fc3f7,#7c9cff);
+    border:none; border-radius: 30px; font-weight:bold; cursor:pointer;
+    box-shadow: 0 0 24px rgba(80,160,255,0.45); transition: transform 0.2s; }
+  button.submit-btn:hover { transform: scale(1.02); }
+  .links { margin-top:20px; text-align:center; font-size:13px; }
+  .links a { color:#7c9cff; text-decoration:none; margin: 0 8px; }
+  .links a:hover { color:#4fc3f7; }
+  .msg { text-align:center; font-size:13px; margin-top:14px; min-height:18px; }
+</style>
+</head>
+<body>
+  <form class="card" id="f" autocomplete="off">
+    <h2>注册新账号</h2>
+    <label>邮箱</label>
+    <input type="email" name="email" id="email" required>
+
+    <label>验证码</label>
+    <div class="code-row">
+      <input type="text" name="code" id="code" required maxlength="6" placeholder="6 位数字">
+      <button type="button" class="code-btn" id="sendCodeBtn">获取验证码</button>
+    </div>
+
+    <label>密码（至少 6 位）</label>
+    <div class="pwd-wrap">
+      <input type="password" name="password" id="pwd1" required minlength="6">
+      <button type="button" class="eye-btn" data-eye="pwd1">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
+        </svg>
+      </button>
+    </div>
+
+    <label>确认密码</label>
+    <div class="pwd-wrap">
+      <input type="password" name="password2" id="pwd2" required minlength="6">
+      <button type="button" class="eye-btn" data-eye="pwd2">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
+        </svg>
+      </button>
+    </div>
+
+    <button type="submit" class="submit-btn">注 册</button>
+    <div class="msg" id="msg"></div>
+    <div class="links">
+      <a href="/login">已有账号？去登录</a> · <a href="/">返回首页</a>
+    </div>
+  </form>
+
+<script>
+// ===== 草稿自动保存/恢复 =====
+const DRAFT_KEYS = ["email", "code", "pwd1", "pwd2"];
+const DRAFT_PREFIX = "reg_draft_";
+
+function saveDraft() {
+  DRAFT_KEYS.forEach(k => {
+    const el = document.getElementById(k);
+    if (el) sessionStorage.setItem(DRAFT_PREFIX + k, el.value);
+  });
+}
+function restoreDraft() {
+  DRAFT_KEYS.forEach(k => {
+    const v = sessionStorage.getItem(DRAFT_PREFIX + k);
+    if (!v) return;
+    const el = document.getElementById(k);
+    if (el) el.value = v;
+  });
+}
+function clearDraft() {
+  DRAFT_KEYS.forEach(k => sessionStorage.removeItem(DRAFT_PREFIX + k));
+}
+
+restoreDraft();
+DRAFT_KEYS.forEach(k => {
+  const el = document.getElementById(k);
+  if (el) el.addEventListener("input", saveDraft);
+});
+
+// ===== 小眼睛 =====
+document.querySelectorAll(".eye-btn").forEach(btn => {
+  btn.addEventListener("click", () => {
+    const input = document.getElementById(btn.dataset.eye);
+    const show = input.type === "password";
+    input.type = show ? "text" : "password";
+    btn.classList.toggle("on", show);
+    btn.innerHTML = show
+      ? `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><path d="M14.12 14.12a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>`
+      : `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>`;
+  });
+});
+
+// ===== 获取验证码 =====
+document.getElementById("sendCodeBtn").addEventListener("click", async () => {
+  const email = document.getElementById("email").value.trim();
+  const btn = document.getElementById("sendCodeBtn");
+  const msg = document.getElementById("msg");
+  if (!email) { msg.style.color = "#ff8f8f"; msg.textContent = "请先输入邮箱"; return; }
+
+  btn.disabled = true; btn.textContent = "发送中…"; msg.textContent = "";
+
+  const res = await fetch("/api/auth/send-code", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email, purpose: "register" })
+  });
+  const d = await res.json();
+
+  if (d.success) {
+    msg.style.color = "#8affa8"; msg.textContent = "验证码已发送，请查收邮箱";
+    let sec = 60;
+    btn.textContent = sec + " 秒后重发";
+    const timer = setInterval(() => {
+      sec--;
+      if (sec <= 0) { clearInterval(timer); btn.disabled = false; btn.textContent = "获取验证码"; }
+      else btn.textContent = sec + " 秒后重发";
+    }, 1000);
+  } else {
+    btn.disabled = false; btn.textContent = "获取验证码";
+    msg.style.color = "#ff8f8f"; msg.textContent = d.error || "发送失败";
+  }
+});
+
+// ===== 提交注册 =====
+document.getElementById("f").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const msg = document.getElementById("msg");
+  msg.textContent = ""; msg.style.color = "#ff8f8f";
+
+  const email = document.getElementById("email").value.trim();
+  const p1 = document.getElementById("pwd1").value;
+  const p2 = document.getElementById("pwd2").value;
+  const code = document.getElementById("code").value;
+
+  if (p1 !== p2) { msg.textContent = "两次密码不一致"; return; }
+  if (p1.length < 6) { msg.textContent = "密码至少 6 位"; return; }
+
+  const res = await fetch("/api/auth/register", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email, password: p1, code })
+  });
+  const data = await res.json();
+  if (data.success) {
+    clearDraft();
+    msg.style.color = "#8affa8"; msg.textContent = "注册成功！正在跳转...";
+    setTimeout(() => location.href = "/login", 1000);
+  } else msg.textContent = data.error || "注册失败";
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>用户中心 · Givera</title>
+<style>
+  body { margin:0; padding:40px 20px; font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;
+    background: radial-gradient(ellipse at bottom, #1b2a4e 0%, #0a0e1a 70%); color:#e8eef7; min-height:100vh; }
+  .wrap { max-width: 720px; margin: 0 auto; }
+  header { display:flex; justify-content:space-between; align-items:center; margin-bottom:24px; }
+  h1 { font-weight: normal; letter-spacing: 3px; font-size: 22px; color:#4fc3f7; margin:0; }
+  .card { background: rgba(20,32,56,0.75); border:1px solid rgba(80,160,255,0.2);
+    border-radius: 16px; padding: 28px; backdrop-filter: blur(10px); }
+  p { color:#b8c6dc; line-height:1.8; margin: 6px 0; }
+  .ghost { padding:10px 22px; border-radius:30px; border:1px solid rgba(80,160,255,0.4);
+    background: transparent; color:#7c9cff; cursor:pointer; font-size:14px; letter-spacing:2px;
+    font-family: inherit; }
+  .ghost:hover { background: rgba(80,160,255,0.15); }
+  a.home { color:#7c9cff; text-decoration:none; font-size:14px; }
+  a.home:hover { color:#4fc3f7; }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <h1>用户中心</h1>
+      <button class="ghost" id="logout">退出登录</button>
+    </header>
+    <div class="card">
+      <p>欢迎回来 👋</p>
+      <p>你已成功登录。这里是普通用户中心页面。</p>
+      <p style="margin-top:20px;"><a class="home" href="/">← 返回首页</a></p>
+    </div>
+  </div>
+<script>
+document.getElementById("logout").onclick = async () => {
+  await fetch("/api/auth/logout", { method: "POST" });
+  location.href = "/login";
+};
+</script>
+</body>
+</html>

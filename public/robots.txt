@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://givera.qzz.io/sitemap.xml
