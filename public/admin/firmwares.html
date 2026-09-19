@@ -9,61 +9,49 @@
 body { margin:0; padding:30px 20px; font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;
   background: radial-gradient(ellipse at bottom, #1b2a4e 0%, #0a0e1a 70%); color:#e8eef7; min-height:100vh; }
 .wrap { max-width: 1100px; margin: 0 auto; }
-header { display:flex; justify-content:space-between; align-items:center; gap:16px;
-  margin-bottom:24px; flex-wrap:wrap; }
+header { display:flex; justify-content:space-between; align-items:center; gap:16px; margin-bottom:24px; flex-wrap:wrap; }
 h1 { font-weight: normal; letter-spacing: 3px; font-size: 22px; color:#4fc3f7; margin:0; }
 .toolbar { display:flex; gap:12px; align-items:center; flex-wrap:wrap; }
 .btn { padding:10px 20px; border-radius:30px; border:none; cursor:pointer; font-size:14px;
-  letter-spacing:1px; transition: transform 0.15s; font-family:inherit; text-decoration:none;
-  display:inline-block; }
+  letter-spacing:1px; transition: transform 0.15s; font-family:inherit; text-decoration:none; display:inline-block; }
 .btn:hover { transform: scale(1.03); }
-.btn-primary { background: linear-gradient(135deg,#4fc3f7,#7c9cff); color:#0a0e1a;
-  font-weight:bold; box-shadow: 0 0 20px rgba(80,160,255,0.35); }
+.btn-primary { background: linear-gradient(135deg,#4fc3f7,#7c9cff); color:#0a0e1a; font-weight:bold; }
 .btn-ghost { background: transparent; color:#7c9cff; border:1px solid rgba(80,160,255,0.4); }
-
 .card { background: rgba(20,32,56,0.75); border:1px solid rgba(80,160,255,0.2);
-  border-radius: 16px; padding: 8px; backdrop-filter: blur(10px); overflow:hidden; }
+  border-radius: 16px; padding: 8px; overflow:hidden; }
 table { width:100%; border-collapse: collapse; }
 th, td { padding:14px 16px; text-align:left; font-size:14px; vertical-align:middle; }
-th { color:#7a8ba8; font-weight:normal; font-size:13px; letter-spacing:1px;
-  border-bottom:1px solid rgba(80,160,255,0.15); }
+th { color:#7a8ba8; font-weight:normal; font-size:13px; letter-spacing:1px; border-bottom:1px solid rgba(80,160,255,0.15); }
 td { border-bottom:1px solid rgba(80,160,255,0.08); }
 tr:last-child td { border-bottom: none; }
 tbody tr:hover td { background: rgba(80,160,255,0.05); }
 .empty { text-align:center; padding:40px; color:#7a8ba8; font-size:14px; }
-
-.mini { padding:6px 14px; font-size:13px; border-radius:20px; border:none; cursor:pointer;
-  font-family:inherit; transition: all 0.2s; }
+.mini { padding:6px 14px; font-size:13px; border-radius:20px; border:none; cursor:pointer; font-family:inherit; }
 .mini-del { background: rgba(255,80,80,0.1); color:#ff8f8f; border:1px solid rgba(255,80,80,0.3); }
 .mini-del:hover { background: rgba(255,80,80,0.25); }
-
 .modal-mask { position: fixed; inset:0; background: rgba(0,0,0,0.7); display:none;
-  align-items:center; justify-content:center; z-index:100; backdrop-filter: blur(4px); padding: 20px; }
+  align-items:center; justify-content:center; z-index:100; padding: 20px; }
 .modal-mask.show { display:flex; }
 .modal { background: #131c30; border:1px solid rgba(80,160,255,0.3); border-radius:18px;
-  width:100%; max-width:520px; padding:28px; box-shadow: 0 0 60px rgba(80,160,255,0.2);
-  max-height: 90vh; overflow-y: auto; }
+  width:100%; max-width:520px; padding:28px; max-height: 90vh; overflow-y: auto; }
 .modal h3 { margin:0 0 20px; font-weight:normal; color:#4fc3f7; letter-spacing:2px; font-size:18px; }
 .field { margin-bottom:16px; }
 .field label { display:block; font-size:13px; color:#7a8ba8; margin-bottom:6px; letter-spacing:1px; }
 .field input, .field select, .field textarea { width:100%; padding:11px 14px; font-family:inherit; font-size:14px;
   background: rgba(10,14,26,0.8); border:1px solid rgba(80,160,255,0.25);
-  border-radius:10px; color:#e8eef7; outline:none; transition:border 0.2s; }
+  border-radius:10px; color:#e8eef7; outline:none; }
 .field input:focus, .field select:focus, .field textarea:focus { border-color:#4fc3f7; }
 .field textarea { min-height: 80px; resize: vertical; }
-
 .upload-btn { display:inline-block; padding:10px 18px; font-size:13px; border-radius:10px;
   border:1px dashed rgba(80,160,255,0.5); background: rgba(80,160,255,0.08);
-  color:#7c9cff; cursor:pointer; transition: all 0.2s; font-family:inherit; width:100%; text-align:center; }
-.upload-btn:hover { background: rgba(80,160,255,0.2); border-style:solid; }
+  color:#7c9cff; cursor:pointer; font-family:inherit; width:100%; text-align:center; }
+.upload-btn:hover { background: rgba(80,160,255,0.2); }
 .upload-btn:disabled { opacity:0.5; cursor:not-allowed; }
 .file-info { font-size:12px; color:#8affa8; margin-top:8px; min-height:16px; }
-
 .modal-actions { display:flex; gap:10px; justify-content:flex-end; margin-top:22px; }
 .msg { font-size:13px; margin-top:12px; min-height:18px; text-align:right; }
 .spinner { display:inline-block; width:14px; height:14px; border:2px solid rgba(255,255,255,0.3);
-  border-top-color:#7c9cff; border-radius:50%; animation: spin 0.8s linear infinite;
-  vertical-align: middle; margin-right: 6px; }
+  border-top-color:#7c9cff; border-radius:50%; animation: spin 0.8s linear infinite; margin-right: 6px; }
 @keyframes spin { to { transform: rotate(360deg); } }
 </style>
 </head>
@@ -78,7 +66,6 @@ tbody tr:hover td { background: rgba(80,160,255,0.05); }
         <button class="btn btn-ghost" id="logout">退出</button>
       </div>
     </header>
-
     <div class="card">
       <table>
         <thead>
@@ -128,25 +115,26 @@ tbody tr:hover td { background: rgba(80,160,255,0.05); }
   </div>
 
 <script>
-const tbody = document.getElementById("tbody");
-const modal = document.getElementById("modal");
-const productEl = document.getElementById("product");
-const versionEl = document.getElementById("version");
-const descEl = document.getElementById("desc");
-const fileInput = document.getElementById("fileInput");
-const fileBtn = document.getElementById("fileBtn");
-const fileInfo = document.getElementById("fileInfo");
-const modalMsg = document.getElementById("modalMsg");
+var tbody = document.getElementById("tbody");
+var modal = document.getElementById("modal");
+var productEl = document.getElementById("product");
+var versionEl = document.getElementById("version");
+var descEl = document.getElementById("desc");
+var fileInput = document.getElementById("fileInput");
+var fileBtn = document.getElementById("fileBtn");
+var fileInfo = document.getElementById("fileInfo");
+var modalMsg = document.getElementById("modalMsg");
 
-let allItems = [];
-let allFirmwares = [];
-let pickedFile = null;
+var allItems = [];
+var allFirmwares = [];
+var pickedFile = null;
 
 function escapeHtml(s) {
-  return String(s == null ? "" : s).replace(/[&<>"']/g, c => ({
-    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
-  }[c]));
+  return String(s == null ? "" : s).replace(/[&<>"']/g, function(c) {
+    return { "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;" }[c];
+  });
 }
+
 function formatSize(bytes) {
   if (!bytes) return "";
   if (bytes < 1024) return bytes + " B";
@@ -156,18 +144,21 @@ function formatSize(bytes) {
 
 async function loadAll() {
   try {
-    const [itemsRes, fwRes] = await Promise.all([
-      fetch("/api/items?t=" + Date.now(), { cache: "no-store", credentials: "include" }),
-      fetch("/api/firmwares-all?t=" + Date.now(), { cache: "no-store", credentials: "include" })
-    ]);
+    var itemsRes = await fetch("/api/items?t=" + Date.now(), { cache: "no-store", credentials: "include" });
     if (itemsRes.status === 401) { location.href = "/login"; return; }
-    const itemsData = await itemsRes.json();
+    var itemsData = await itemsRes.json();
     allItems = itemsData.items || [];
-    const fwData = fwRes.ok ? await fwRes.json() : { firmwares: [] };
-    allFirmwares = fwData.firmwares || [];
+
+    var fwRes = await fetch("/api/firmwares-all?t=" + Date.now(), { cache: "no-store", credentials: "include" });
+    if (fwRes.ok) {
+      var fwData = await fwRes.json();
+      allFirmwares = fwData.firmwares || [];
+    } else {
+      allFirmwares = [];
+    }
     render();
-  } catch {
-    tbody.innerHTML = '<tr><td colspan="6" class="empty">加载失败</td></tr>';
+  } catch (e) {
+    tbody.innerHTML = '<tr><td colspan="6" class="empty">加载失败：' + e.message + '</td></tr>';
   }
 }
 
@@ -176,18 +167,18 @@ function render() {
     tbody.innerHTML = '<tr><td colspan="6" class="empty">还没有固件，点右上角「添加固件」</td></tr>';
     return;
   }
-  const productMap = {};
-  allItems.forEach(it => { productMap[it.id] = it.name; });
-  tbody.innerHTML = allFirmwares.map(f => `
-    <tr>
-      <td>${escapeHtml(productMap[f.product_id] || ("#" + f.product_id))}</td>
-      <td style="color:#4fc3f7;">${escapeHtml(f.version)}</td>
-      <td style="color:#b8c6dc;">${escapeHtml(f.description || "")}</td>
-      <td style="font-size:12px; color:#7a8ba8;">${escapeHtml(f.file_name)}</td>
-      <td style="font-size:12px; color:#7a8ba8;">${formatSize(f.file_size)}</td>
-      <td><button class="mini mini-del" data-del="${f.id}">删除</button></td>
-    </tr>
-  `).join("");
+  var productMap = {};
+  allItems.forEach(function(it) { productMap[it.id] = it.name; });
+  tbody.innerHTML = allFirmwares.map(function(f) {
+    return '<tr>' +
+      '<td>' + escapeHtml(productMap[f.product_id] || ("#" + f.product_id)) + '</td>' +
+      '<td style="color:#4fc3f7;">' + escapeHtml(f.version) + '</td>' +
+      '<td style="color:#b8c6dc;">' + escapeHtml(f.description || "") + '</td>' +
+      '<td style="font-size:12px; color:#7a8ba8;">' + escapeHtml(f.file_name) + '</td>' +
+      '<td style="font-size:12px; color:#7a8ba8;">' + formatSize(f.file_size) + '</td>' +
+      '<td><button class="mini mini-del" data-del="' + f.id + '">删除</button></td>' +
+      '</tr>';
+  }).join("");
 }
 
 function openModal() {
@@ -197,29 +188,31 @@ function openModal() {
   pickedFile = null;
   fileInfo.textContent = "";
   fileInput.value = "";
-  productEl.innerHTML = allItems.map(it =>
-    `<option value="${it.id}">${escapeHtml(it.name)}</option>`
-  ).join("");
+  productEl.innerHTML = allItems.map(function(it) {
+    return '<option value="' + it.id + '">' + escapeHtml(it.name) + '</option>';
+  }).join("");
   if (!allItems.length) {
     productEl.innerHTML = '<option value="">（请先添加产品）</option>';
   }
   modal.classList.add("show");
 }
+
 function closeModal() { modal.classList.remove("show"); }
 
-fileBtn.onclick = () => fileInput.click();
-fileInput.addEventListener("change", () => {
-  const f = fileInput.files[0];
+fileBtn.onclick = function() { fileInput.click(); };
+
+fileInput.addEventListener("change", function() {
+  var f = fileInput.files[0];
   if (!f) return;
   pickedFile = f;
-  fileInfo.textContent = `已选择：${f.name}（${formatSize(f.size)}）`;
+  fileInfo.textContent = "已选择：" + f.name + "（" + formatSize(f.size) + "）";
 });
 
-async function fileToBase64(file) {
-  return new Promise((res, rej) => {
-    const r = new FileReader();
-    r.onload = () => {
-      const s = r.result;
+function fileToBase64(file) {
+  return new Promise(function(res, rej) {
+    var r = new FileReader();
+    r.onload = function() {
+      var s = r.result;
       res(s.split(",")[1] || "");
     };
     r.onerror = rej;
@@ -227,73 +220,73 @@ async function fileToBase64(file) {
   });
 }
 
-tbody.addEventListener("click", async (e) => {
-  const id = e.target.dataset.del;
+tbody.addEventListener("click", async function(e) {
+  var id = e.target.dataset.del;
   if (!id) return;
   if (!confirm("确定删除这条固件吗？会同时删除 GitHub 上的文件。")) return;
-  const res = await fetch("/api/firmwares/" + id, { method: "DELETE", credentials: "include" });
-  const d = await res.json();
-if (d.success) {
-  if (d.gh_error) {
-    alert("数据库记录已删除，但 GitHub 文件删除失败：" + d.gh_error + "\n请手动去 GitHub 删。");
+  var res = await fetch("/api/firmwares/" + id, { method: "DELETE", credentials: "include" });
+  var d = await res.json();
+  if (d.success) {
+    if (d.gh_error) {
+      alert("数据库记录已删除，但 GitHub 文件删除失败：" + d.gh_error);
+    }
+    loadAll();
+  } else {
+    alert(d.error || "删除失败");
   }
-  loadAll();
-}
-else alert(d.error || "删除失败");
+});
 
 document.getElementById("addBtn").onclick = openModal;
 document.getElementById("cancelBtn").onclick = closeModal;
-modal.addEventListener("click", (e) => { if (e.target === modal) closeModal(); });
+modal.addEventListener("click", function(e) { if (e.target === modal) closeModal(); });
 
-document.getElementById("saveBtn").onclick = async () => {
-  const productId = productEl.value;
-  const version = versionEl.value.trim();
-  const description = descEl.value;
+document.getElementById("saveBtn").onclick = async function() {
+  var productId = productEl.value;
+  var version = versionEl.value.trim();
+  var description = descEl.value;
 
   if (!productId) { modalMsg.style.color="#ff8f8f"; modalMsg.textContent="请选择产品"; return; }
   if (!version) { modalMsg.style.color="#ff8f8f"; modalMsg.textContent="请填写版本号"; return; }
   if (!pickedFile) { modalMsg.style.color="#ff8f8f"; modalMsg.textContent="请选择固件文件"; return; }
 
-  const saveBtn = document.getElementById("saveBtn");
+  var saveBtn = document.getElementById("saveBtn");
   saveBtn.disabled = true;
-  const orig = saveBtn.textContent;
+  var orig = saveBtn.textContent;
   saveBtn.innerHTML = '<span class="spinner"></span>上传中…';
   modalMsg.textContent = "";
 
   try {
-    // 1. 上传文件到 GitHub
-    const base64 = await fileToBase64(pickedFile);
+    var base64 = await fileToBase64(pickedFile);
     modalMsg.style.color = "#7a8ba8";
     modalMsg.textContent = "上传文件到 GitHub…";
-    const upRes = await fetch("/api/upload-firmware", {
+    var upRes = await fetch("/api/upload-firmware", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       credentials: "include",
       body: JSON.stringify({ name: pickedFile.name, data: base64 })
     });
-    const upD = await upRes.json();
+    var upD = await upRes.json();
     if (!upD.success) throw new Error(upD.error || "文件上传失败");
 
-    // 2. 存数据库
     modalMsg.textContent = "写入数据库…";
-    const dbRes = await fetch("/api/firmwares", {
+    var dbRes = await fetch("/api/firmwares", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       credentials: "include",
       body: JSON.stringify({
         product_id: productId,
-        version,
-        description,
+        version: version,
+        description: description,
         file_name: upD.file_name,
         file_size: upD.file_size
       })
     });
-    const dbD = await dbRes.json();
+    var dbD = await dbRes.json();
     if (!dbD.success) throw new Error(dbD.error || "保存失败");
 
     modalMsg.style.color = "#8affa8";
     modalMsg.textContent = "✓ 上传成功！约 1-2 分钟后可在产品页下载";
-    setTimeout(() => { closeModal(); loadAll(); }, 1200);
+    setTimeout(function() { closeModal(); loadAll(); }, 1200);
   } catch (e) {
     modalMsg.style.color = "#ff8f8f";
     modalMsg.textContent = "✗ " + e.message;
@@ -303,7 +296,7 @@ document.getElementById("saveBtn").onclick = async () => {
   }
 };
 
-document.getElementById("logout").onclick = async () => {
+document.getElementById("logout").onclick = async function() {
   await fetch("/api/auth/logout", { method: "POST", credentials: "include" });
   location.href = "/login";
 };
