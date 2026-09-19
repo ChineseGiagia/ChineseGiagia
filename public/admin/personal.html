@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>私人数据 · Givera</title>
+<style>
+* { box-sizing: border-box; }
+body { margin:0; padding:30px 20px; font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;
+  background: radial-gradient(ellipse at bottom, #1b2a4e 0%, #0a0e1a 70%); color:#e8eef7; min-height:100vh; }
+.wrap { max-width: 1100px; margin: 0 auto; }
+header { display:flex; justify-content:space-between; align-items:center; gap:16px;
+  margin-bottom:24px; flex-wrap:wrap; }
+h1 { font-weight: normal; letter-spacing: 3px; font-size: 22px; color:#4fc3f7; margin:0; }
+.toolbar { display:flex; gap:12px; align-items:center; flex-wrap:wrap; }
+.search { padding:10px 16px; border-radius:30px; border:1px solid rgba(80,160,255,0.3);
+  background: rgba(10,14,26,0.7); color:#e8eef7; outline:none; min-width:220px;
+  font-size:14px; transition:border 0.2s; }
+.search:focus { border-color:#4fc3f7; }
+.btn { padding:10px 20px; border-radius:30px; border:none; cursor:pointer; font-size:14px;
+  letter-spacing:1px; transition: transform 0.15s; font-family:inherit; text-decoration:none;
+  display:inline-block; }
+.btn:hover { transform: scale(1.03); }
+.btn-primary { background: linear-gradient(135deg,#4fc3f7,#7c9cff); color:#0a0e1a;
+  font-weight:bold; box-shadow: 0 0 20px rgba(80,160,255,0.35); }
+.btn-ghost { background: transparent; color:#7c9cff; border:1px solid rgba(80,160,255,0.4); }
+
+.card { background: rgba(20,32,56,0.75); border:1px solid rgba(80,160,255,0.2);
+  border-radius: 16px; padding: 8px; backdrop-filter: blur(10px); overflow:hidden; }
+
+table { width:100%; border-collapse: collapse; }
+th, td { padding:14px 16px; text-align:left; font-size:14px; vertical-align:middle; }
+th { color:#7a8ba8; font-weight:normal; font-size:13px; letter-spacing:1px;
+  border-bottom:1px solid rgba(80,160,255,0.15); }
+td { border-bottom:1px solid rgba(80,160,255,0.08); }
+tr:last-child td { border-bottom: none; }
+tbody tr:hover td { background: rgba(80,160,255,0.05); }
+
+.thumb { width:48px; height:48px; object-fit:cover; border-radius:8px;
+  background: rgba(10,14,26,0.6); border:1px solid rgba(80,160,255,0.2); display:block; }
+.thumb.placeholder { background: rgba(10,14,26,0.6); }
+.empty { text-align:center; padding:40px; color:#7a8ba8; font-size:14px; }
+.name-cell { color:#e8eef7; font-weight:500; }
+.desc-cell { color:#b8c6dc; max-width: 420px; word-break: break-word; }
+
+mark { background: rgba(80,200,255,0.35); color:#e8eef7; padding:0 2px; border-radius:3px; }
+
+.row-actions { display:flex; gap:8px; }
+.mini { padding:6px 14px; font-size:13px; border-radius:20px; border:none; cursor:pointer;
+  font-family:inherit; transition: all 0.2s; }
+.mini-edit { background: rgba(80,160,255,0.15); color:#4fc3f7; border:1px solid rgba(80,160,255,0.3); }
+.mini-edit:hover { background: rgba(80,160,255,0.3); }
+.mini-del { background: rgba(255,80,80,0.1); color:#ff8f8f; border:1px solid rgba(255,80,80,0.3); }
+.mini-del:hover { background: rgba(255,80,80,0.25); }
+
+.modal-mask { position: fixed; inset:0; background: rgba(0,0,0,0.7); display:none;
+  align-items:center; justify-content:center; z-index:100; backdrop-filter: blur(4px); padding: 20px; }
+.modal-mask.show { display:flex; }
+.modal { background: #131c30; border:1px solid rgba(80,160,255,0.3); border-radius:18px;
+  width:100%; max-width:560px; padding:28px; box-shadow: 0 0 60px rgba(80,160,255,0.2);
+  max-height: 90vh; overflow-y: auto; }
+.modal h3 { margin:0 0 20px; font-weight:normal; color:#4fc3f7; letter-spacing:2px; font-size:18px; }
+.field { margin-bottom:18px; }
+.field label { display:block; font-size:13px; color:#7a8ba8; margin-bottom:6px; letter-spacing:1px; }
+.field input, .field textarea { width:100%; padding:11px 14px; font-family:inherit; font-size:14px;
+  background: rgba(10,14,26,0.8); border:1px solid rgba(80,160,255,0.25);
+  border-radius:10px; color:#e8eef7; outline:none; transition:border 0.2s; }
+.field input:focus, .field textarea:focus { border-color:#4fc3f7; }
+.field textarea { min-height: 140px; resize: vertical; }
+
+.upload-btn { display:inline-block; padding:8px 16px; font-size:13px; border-radius:10px;
+  border:1px dashed rgba(80,160,255,0.5); background: rgba(80,160,255,0.08);
+  color:#7c9cff; cursor:pointer; transition: all 0.2s; font-family:inherit; }
+.upload-btn:hover { background: rgba(80,160,255,0.2); border-style:solid; }
+.upload-btn:disabled { opacity:0.5; cursor:not-allowed; }
+
+.gallery-grid { display:grid; grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+  gap: 8px; margin-top: 10px; }
+.gallery-item { position: relative; aspect-ratio: 1; border-radius:8px; overflow:hidden;
+  border:1px solid rgba(80,160,255,0.25); background: rgba(10,14,26,0.6); }
+.gallery-item img { width:100%; height:100%; object-fit: cover; display:block; }
+.gallery-item .rm { position:absolute; top:4px; right:4px; width:20px; height:20px;
+  border-radius:50%; border:none; cursor:pointer; background: rgba(255,80,80,0.85);
+  color:#fff; font-size:12px; line-height:1; display:flex; align-items:center; justify-content:center; }
+.gallery-item .rm:hover { background: rgba(255,50,50,1); }
+
+.modal-actions { display:flex; gap:10px; justify-content:flex-end; margin-top:22px; }
+.msg { font-size:13px; margin-top:12px; min-height:18px; text-align:right; color:#8affa8; }
+
+.spinner { display:inline-block; width:14px; height:14px; border:2px solid rgba(255,255,255,0.3);
+  border-top-color:#7c9cff; border-radius:50%; animation: spin 0.8s linear infinite;
+  vertical-align: middle; margin-right: 6px; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+@media (max-width: 720px) {
+  .desc-cell { max-width: 140px; }
+  th, td { padding: 10px 8px; font-size: 13px; }
+  .thumb { width:36px; height:36px; }
+  .search { min-width: 0; flex:1; }
+}
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <h1>私人数据</h1>
+      <div class="toolbar">
+        <input class="search" id="search" placeholder="搜索名称或描述…">
+        <a class="btn btn-ghost" href="/admin/">← 产品管理</a>
+        <button class="btn btn-primary" id="addBtn">+ 添加记录</button>
+        <button class="btn btn-ghost" id="logout">退出</button>
+      </div>
+    </header>
+
+    <div class="card">
+      <table>
+        <thead>
+          <tr>
+            <th style="width:70px">图片</th>
+            <th style="width:24%">名称</th>
+            <th>描述</th>
+            <th style="width:170px">操作</th>
+          </tr>
+        </thead>
+        <tbody id="tbody">
+          <tr><td colspan="4" class="empty">加载中…</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="modal-mask" id="modal">
+    <div class="modal">
+      <h3 id="modalTitle">添加记录</h3>
+      <input type="hidden" id="itemId">
+
+      <div class="field">
+        <label>名称</label>
+        <input id="name" placeholder="记录名称">
+      </div>
+
+      <div class="field">
+        <label>详细描述</label>
+        <textarea id="desc" placeholder="记录内容"></textarea>
+      </div>
+
+      <div class="field">
+        <label>图片（可多张）</label>
+        <button type="button" class="upload-btn" id="galleryBtn">🖼️ 上传照片</button>
+        <input type="file" id="galleryInput" accept="image/*" multiple style="display:none">
+        <div class="gallery-grid" id="galleryGrid"></div>
+      </div>
+
+      <div class="modal-actions">
+        <button class="btn btn-ghost" id="cancelBtn">取消</button>
+        <button class="btn btn-primary" id="saveBtn">保存</button>
+      </div>
+      <div class="msg" id="modalMsg"></div>
+    </div>
+  </div>
+
+<script>
+const tbody = document.getElementById("tbody");
+const searchInput = document.getElementById("search");
+const modal = document.getElementById("modal");
+const modalTitle = document.getElementById("modalTitle");
+const itemIdEl = document.getElementById("itemId");
+const nameEl = document.getElementById("name");
+const descEl = document.getElementById("desc");
+const galleryInput = document.getElementById("galleryInput");
+const galleryBtn = document.getElementById("galleryBtn");
+const galleryGrid = document.getElementById("galleryGrid");
+const modalMsg = document.getElementById("modalMsg");
+
+let allItems = [];
+let currentGallery = [];
+
+function compressImage(file, maxSize = 1400, quality = 0.82) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const img = new Image();
+      img.onload = () => {
+        let w = img.width, h = img.height;
+        if (w > maxSize || h > maxSize) {
+          if (w > h) { h = Math.round(h * maxSize / w); w = maxSize; }
+          else { w = Math.round(w * maxSize / h); h = maxSize; }
+        }
+        const canvas = document.createElement("canvas");
+        canvas.width = w; canvas.height = h;
+        canvas.getContext("2d").drawImage(img, 0, 0, w, h);
+        resolve(canvas.toDataURL("image/jpeg", quality));
+      };
+      img.onerror = () => reject(new Error("图片读取失败"));
+      img.src = e.target.result;
+    };
+    reader.onerror = () => reject(new Error("文件读取失败"));
+    reader.readAsDataURL(file);
+  });
+}
+
+async function uploadImage(dataUrl) {
+  const res = await fetch("/api/upload", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    credentials: "include",
+    body: JSON.stringify({ data: dataUrl })
+  });
+  const d = await res.json();
+  if (!d.success) throw new Error(d.error || "上传失败");
+  return d.url;
+}
+
+async function loadItems() {
+  try {
+    const res = await fetch("/api/notes?t=" + Date.now(), {
+      cache: "no-store", credentials: "include"
+    });
+    if (res.status === 401) { location.href = "/login"; return; }
+    const data = await res.json();
+    allItems = data.notes || [];
+    render();
+  } catch {
+    tbody.innerHTML = '<tr><td colspan="4" class="empty">加载失败</td></tr>';
+  }
+}
+
+function escapeHtml(s) {
+  return String(s == null ? "" : s).replace(/[&<>"']/g, c => ({
+    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+  }[c]));
+}
+function matchItem(item, query) {
+  if (!query) return true;
+  const q = query.toLowerCase().trim();
+  const name = (item.name || "").toLowerCase();
+  const desc = (item.description || "").toLowerCase();
+  if (name.includes(q) || desc.includes(q)) return true;
+  const terms = q.split(/\s+/).filter(Boolean);
+  if (terms.length > 1) return terms.every(t => name.includes(t) || desc.includes(t));
+  return false;
+}
+function highlight(text, query) {
+  const safe = escapeHtml(text || "");
+  if (!query) return safe;
+  const q = query.trim();
+  if (!q) return safe;
+  const esc = q.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  return safe.replace(new RegExp("(" + esc + ")", "gi"), "<mark>$1</mark>");
+}
+function firstImage(item) {
+  if (item.image_url) return item.image_url;
+  try {
+    const g = item.gallery ? JSON.parse(item.gallery) : [];
+    return g[0] || "";
+  } catch { return ""; }
+}
+
+function render() {
+  const q = searchInput.value.trim();
+  const filtered = allItems.filter(it => matchItem(it, q));
+  if (!filtered.length) {
+    tbody.innerHTML = `<tr><td colspan="4" class="empty">${
+      q ? "没有匹配的结果" : "还没有数据，点击右上角「添加记录」"
+    }</td></tr>`;
+    return;
+  }
+  tbody.innerHTML = filtered.map(it => {
+    const thumb = firstImage(it);
+    return `
+      <tr>
+        <td>${thumb
+          ? `<img class="thumb" src="${escapeHtml(thumb)}" onerror="this.classList.add('placeholder');this.removeAttribute('src')">`
+          : '<div class="thumb placeholder"></div>'}</td>
+        <td class="name-cell">${highlight(it.name, q)}</td>
+        <td class="desc-cell">${highlight(it.description || "", q)}</td>
+        <td>
+          <div class="row-actions">
+            <button class="mini mini-edit" data-edit="${it.id}">编辑</button>
+            <button class="mini mini-del" data-del="${it.id}">删除</button>
+          </div>
+        </td>
+      </tr>`;
+  }).join("");
+}
+searchInput.addEventListener("input", render);
+
+function openModal(item) {
+  modalMsg.textContent = "";
+  if (item) {
+    modalTitle.textContent = "编辑记录";
+    itemIdEl.value = item.id;
+    nameEl.value = item.name || "";
+    descEl.value = item.description || "";
+    try { currentGallery = item.gallery ? JSON.parse(item.gallery) : []; }
+    catch { currentGallery = []; }
+  } else {
+    modalTitle.textContent = "添加记录";
+    itemIdEl.value = "";
+    nameEl.value = "";
+    descEl.value = "";
+    currentGallery = [];
+  }
+  renderGallery();
+  modal.classList.add("show");
+  setTimeout(() => nameEl.focus(), 50);
+}
+function closeModal() { modal.classList.remove("show"); }
+
+function renderGallery() {
+  if (!currentGallery.length) { galleryGrid.innerHTML = ""; return; }
+  galleryGrid.innerHTML = currentGallery.map((url, i) => `
+    <div class="gallery-item">
+      <img src="${escapeHtml(url)}" alt="">
+      <button type="button" class="rm" data-i="${i}">✕</button>
+    </div>
+  `).join("");
+}
+galleryGrid.addEventListener("click", (e) => {
+  const i = e.target.dataset.i;
+  if (i != null) { currentGallery.splice(parseInt(i, 10), 1); renderGallery(); }
+});
+
+galleryBtn.onclick = () => galleryInput.click();
+galleryInput.addEventListener("change", async () => {
+  const files = Array.from(galleryInput.files || []);
+  if (!files.length) return;
+  galleryInput.value = "";
+  galleryBtn.disabled = true;
+  const orig = galleryBtn.textContent;
+  let done = 0;
+  for (const f of files) {
+    galleryBtn.innerHTML = `<span class="spinner"></span>上传中 ${done + 1}/${files.length}…`;
+    try {
+      const dataUrl = await compressImage(f);
+      const url = await uploadImage(dataUrl);
+      currentGallery.push(url);
+      renderGallery();
+      done++;
+    } catch (e) {
+      modalMsg.style.color = "#ff8f8f";
+      modalMsg.textContent = `第 ${done + 1} 张失败：${e.message}`;
+      break;
+    }
+  }
+  galleryBtn.disabled = false;
+  galleryBtn.textContent = orig;
+  if (done > 0) {
+    modalMsg.style.color = "#8affa8";
+    modalMsg.textContent = `✓ 已上传 ${done} 张`;
+  }
+});
+
+tbody.addEventListener("click", async (e) => {
+  const editId = e.target.dataset.edit;
+  const delId = e.target.dataset.del;
+  if (editId) {
+    try {
+      const res = await fetch("/api/notes/" + editId + "?t=" + Date.now(), {
+        cache: "no-store", credentials: "include"
+      });
+      const it = await res.json();
+      if (it.error) { alert(it.error); return; }
+      openModal(it);
+    } catch { alert("加载失败"); }
+  }
+  if (delId) {
+    if (!confirm("确定要删除这条记录吗？")) return;
+    const res = await fetch(`/api/notes/${delId}?t=` + Date.now(), {
+      method: "DELETE", credentials: "include"
+    });
+    const d = await res.json();
+    if (d.success) loadItems();
+    else alert(d.error || "删除失败");
+  }
+});
+
+document.getElementById("addBtn").onclick = () => openModal(null);
+document.getElementById("cancelBtn").onclick = closeModal;
+modal.addEventListener("click", (e) => { if (e.target === modal) closeModal(); });
+
+document.getElementById("saveBtn").onclick = async () => {
+  const id = itemIdEl.value;
+  const body = {
+    name: nameEl.value.trim(),
+    description: descEl.value,
+    image_url: currentGallery[0] || "",
+    gallery: currentGallery
+  };
+  if (!body.name) {
+    modalMsg.style.color = "#ff8f8f";
+    modalMsg.textContent = "名称不能为空";
+    return;
+  }
+  modalMsg.style.color = "#7a8ba8";
+  modalMsg.textContent = "保存中…";
+  try {
+    const url = id ? `/api/notes/${id}?t=` + Date.now() : "/api/notes?t=" + Date.now();
+    const method = id ? "PUT" : "POST";
+    const res = await fetch(url, {
+      method,
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify(body)
+    });
+    const text = await res.text();
+    let d;
+    try { d = JSON.parse(text); } catch { d = { error: "HTTP " + res.status }; }
+    if (res.ok && d.success) {
+      modalMsg.style.color = "#8affa8";
+      modalMsg.textContent = "✓ 已保存";
+      closeModal();
+      await loadItems();
+    } else {
+      modalMsg.style.color = "#ff8f8f";
+      modalMsg.textContent = d.error || "保存失败";
+    }
+  } catch (err) {
+    modalMsg.style.color = "#ff8f8f";
+    modalMsg.textContent = "网络错误：" + err.message;
+  }
+};
+
+document.getElementById("logout").onclick = async () => {
+  await fetch("/api/auth/logout", { method: "POST", credentials: "include" });
+  location.href = "/login";
+};
+
+loadItems();
+</script>
+</body>
+</html>
