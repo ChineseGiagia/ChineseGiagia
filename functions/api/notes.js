@@ -1,10 +1,13 @@
 import { getSessionUser, json } from "../_lib/auth.js";
 
-export async function onRequestGet({ env }) {
+export async function onRequestGet({ request, env }) {
+  const user = await getSessionUser(request, env);
+  if (!user || user.role !== "admin") return json({ error: "无权限" }, { status: 401 });
+
   const rows = await env.DB.prepare(
-    "SELECT id, name, description, image_url, gallery FROM items ORDER BY id DESC"
+    "SELECT id, name, description, image_url, gallery FROM notes ORDER BY id DESC"
   ).all();
-  return json({ items: rows.results }, {
+  return json({ notes: rows.results }, {
     headers: { "Cache-Control": "no-store" }
   });
 }
@@ -13,14 +16,14 @@ export async function onRequestPost({ request, env }) {
   const user = await getSessionUser(request, env);
   if (!user || user.role !== "admin") return json({ error: "无权限" }, { status: 401 });
 
-  const { name, description, content, image_url, gallery } = await request.json().catch(() => ({}));
+  const { name, description, image_url, gallery } = await request.json().catch(() => ({}));
   if (!name || !name.trim()) return json({ error: "名称不能为空" }, { status: 400 });
 
   const galleryStr = Array.isArray(gallery) ? JSON.stringify(gallery) : (gallery || "");
 
   const result = await env.DB.prepare(
-    "INSERT INTO items (name, description, content, image_url, gallery) VALUES (?, ?, ?, ?, ?)"
-  ).bind(name.trim(), description || "", content || "", image_url || "", galleryStr).run();
+    "INSERT INTO notes (name, description, image_url, gallery) VALUES (?, ?, ?, ?)"
+  ).bind(name.trim(), description || "", image_url || "", galleryStr).run();
 
   return json({ success: true, id: result.meta.last_row_id });
 }
