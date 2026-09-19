@@ -8,93 +8,139 @@
 * { box-sizing: border-box; }
 body { margin:0; padding:30px 20px; font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;
   background: radial-gradient(ellipse at bottom, #1b2a4e 0%, #0a0e1a 70%); color:#e8eef7; min-height:100vh; }
-.wrap { max-width: 900px; margin: 0 auto; }
-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:24px; flex-wrap:wrap; gap:12px; }
+.wrap { max-width: 1100px; margin: 0 auto; }
+header { display:flex; justify-content:space-between; align-items:center; gap:16px;
+  margin-bottom:24px; flex-wrap:wrap; }
 h1 { font-weight: normal; letter-spacing: 3px; font-size: 22px; color:#4fc3f7; margin:0; }
-.actions { display:flex; gap:10px; }
+.toolbar { display:flex; gap:12px; align-items:center; flex-wrap:wrap; }
 .btn { padding:10px 20px; border-radius:30px; border:none; cursor:pointer; font-size:14px;
-  letter-spacing:1px; transition: transform 0.15s; font-family:inherit; text-decoration:none; }
+  letter-spacing:1px; transition: transform 0.15s; font-family:inherit; text-decoration:none;
+  display:inline-block; }
 .btn:hover { transform: scale(1.03); }
-.btn-primary { background: linear-gradient(135deg,#4fc3f7,#7c9cff); color:#0a0e1a; font-weight:bold;
-  box-shadow: 0 0 20px rgba(80,160,255,0.35); }
+.btn-primary { background: linear-gradient(135deg,#4fc3f7,#7c9cff); color:#0a0e1a;
+  font-weight:bold; box-shadow: 0 0 20px rgba(80,160,255,0.35); }
 .btn-ghost { background: transparent; color:#7c9cff; border:1px solid rgba(80,160,255,0.4); }
 
 .card { background: rgba(20,32,56,0.75); border:1px solid rgba(80,160,255,0.2);
-  border-radius: 16px; padding: 24px; backdrop-filter: blur(10px); margin-bottom: 22px; }
-.card h2 { font-weight: normal; color: #4fc3f7; font-size: 16px; letter-spacing: 2px;
-  margin: 0 0 18px; padding-bottom: 10px; border-bottom: 1px solid rgba(80,160,255,0.2); }
+  border-radius: 16px; padding: 8px; backdrop-filter: blur(10px); overflow:hidden; }
+table { width:100%; border-collapse: collapse; }
+th, td { padding:14px 16px; text-align:left; font-size:14px; vertical-align:middle; }
+th { color:#7a8ba8; font-weight:normal; font-size:13px; letter-spacing:1px;
+  border-bottom:1px solid rgba(80,160,255,0.15); }
+td { border-bottom:1px solid rgba(80,160,255,0.08); }
+tr:last-child td { border-bottom: none; }
+tbody tr:hover td { background: rgba(80,160,255,0.05); }
+.empty { text-align:center; padding:40px; color:#7a8ba8; font-size:14px; }
 
-label { display:block; font-size:13px; color:#7a8ba8; margin-bottom:6px; letter-spacing:1px; }
-input, select, textarea { width:100%; padding:10px 12px; font-family:inherit; font-size:14px;
-  background: rgba(10,14,26,0.8); border:1px solid rgba(80,160,255,0.25);
-  border-radius:10px; color:#e8eef7; outline:none; transition:border 0.2s; margin-bottom:14px; }
-input:focus, select:focus, textarea:focus { border-color:#4fc3f7; }
-textarea { min-height: 70px; resize: vertical; }
-select option { background: #131c30; }
-
-.file-row { display:flex; gap:10px; align-items:center; margin-bottom:14px; }
-.file-row input[type="file"] { flex:1; padding: 8px 10px; margin-bottom:0; }
-.file-hint { font-size: 12px; color: #7a8ba8; }
-
-.msg { font-size: 13px; margin-top: 8px; min-height: 18px; text-align: right; }
-
-.fw-item { display:flex; justify-content:space-between; align-items:center;
-  padding: 14px 18px; background: rgba(30,48,80,0.5); border-radius: 12px;
-  border-left: 3px solid #4fc3f7; margin-bottom: 10px; gap: 16px; flex-wrap: wrap; }
-.fw-info { flex: 1; min-width: 200px; }
-.fw-version { font-size: 15px; color:#e8eef7; font-weight: 500; margin-bottom: 4px; }
-.fw-desc { font-size: 13px; color:#b8c6dc; line-height: 1.6; }
-.fw-meta { font-size: 12px; color:#7a8ba8; margin-top: 4px; word-break: break-all; }
-.mini-del { padding:6px 14px; font-size:13px; border-radius:20px; cursor:pointer; font-family:inherit;
-  background: rgba(255,80,80,0.1); color:#ff8f8f; border:1px solid rgba(255,80,80,0.3); transition: all 0.2s; }
+.mini { padding:6px 14px; font-size:13px; border-radius:20px; border:none; cursor:pointer;
+  font-family:inherit; transition: all 0.2s; }
+.mini-del { background: rgba(255,80,80,0.1); color:#ff8f8f; border:1px solid rgba(255,80,80,0.3); }
 .mini-del:hover { background: rgba(255,80,80,0.25); }
 
-.empty { text-align:center; padding: 30px; color: #7a8ba8; font-size: 14px; }
+.modal-mask { position: fixed; inset:0; background: rgba(0,0,0,0.7); display:none;
+  align-items:center; justify-content:center; z-index:100; backdrop-filter: blur(4px); padding: 20px; }
+.modal-mask.show { display:flex; }
+.modal { background: #131c30; border:1px solid rgba(80,160,255,0.3); border-radius:18px;
+  width:100%; max-width:520px; padding:28px; box-shadow: 0 0 60px rgba(80,160,255,0.2);
+  max-height: 90vh; overflow-y: auto; }
+.modal h3 { margin:0 0 20px; font-weight:normal; color:#4fc3f7; letter-spacing:2px; font-size:18px; }
+.field { margin-bottom:16px; }
+.field label { display:block; font-size:13px; color:#7a8ba8; margin-bottom:6px; letter-spacing:1px; }
+.field input, .field select, .field textarea { width:100%; padding:11px 14px; font-family:inherit; font-size:14px;
+  background: rgba(10,14,26,0.8); border:1px solid rgba(80,160,255,0.25);
+  border-radius:10px; color:#e8eef7; outline:none; transition:border 0.2s; }
+.field input:focus, .field select:focus, .field textarea:focus { border-color:#4fc3f7; }
+.field textarea { min-height: 80px; resize: vertical; }
+
+.upload-btn { display:inline-block; padding:10px 18px; font-size:13px; border-radius:10px;
+  border:1px dashed rgba(80,160,255,0.5); background: rgba(80,160,255,0.08);
+  color:#7c9cff; cursor:pointer; transition: all 0.2s; font-family:inherit; width:100%; text-align:center; }
+.upload-btn:hover { background: rgba(80,160,255,0.2); border-style:solid; }
+.upload-btn:disabled { opacity:0.5; cursor:not-allowed; }
+.file-info { font-size:12px; color:#8affa8; margin-top:8px; min-height:16px; }
+
+.modal-actions { display:flex; gap:10px; justify-content:flex-end; margin-top:22px; }
+.msg { font-size:13px; margin-top:12px; min-height:18px; text-align:right; }
+.spinner { display:inline-block; width:14px; height:14px; border:2px solid rgba(255,255,255,0.3);
+  border-top-color:#7c9cff; border-radius:50%; animation: spin 0.8s linear infinite;
+  vertical-align: middle; margin-right: 6px; }
+@keyframes spin { to { transform: rotate(360deg); } }
 </style>
 </head>
 <body>
   <div class="wrap">
     <header>
       <h1>固件管理</h1>
-      <div class="actions">
-        <a class="btn btn-ghost" href="/admin/">← 返回数据管理</a>
+      <div class="toolbar">
+        <a class="btn btn-ghost" href="/admin/">← 产品管理</a>
+        <a class="btn btn-ghost" href="/admin/personal">私人数据</a>
+        <button class="btn btn-primary" id="addBtn">+ 添加固件</button>
         <button class="btn btn-ghost" id="logout">退出</button>
       </div>
     </header>
 
     <div class="card">
-      <h2>上传新固件</h2>
-      <label>选择产品</label>
-      <select id="productSel"></select>
-
-      <label>版本号</label>
-      <input id="version" placeholder="例如 v1.0.0">
-
-      <label>更新说明</label>
-      <textarea id="description" placeholder="例如：修复了闹钟不响的问题"></textarea>
-
-      <label>固件文件（.zip）</label>
-      <div class="file-row">
-        <input type="file" id="fileInput" accept=".zip">
-      </div>
-      <div class="file-hint">文件大小建议不超过 20MB</div>
-
-      <div class="msg" id="msg"></div>
-      <div style="text-align:right; margin-top:12px;">
-        <button class="btn btn-primary" id="uploadBtn">上传固件</button>
-      </div>
+      <table>
+        <thead>
+          <tr>
+            <th style="width:30%">所属产品</th>
+            <th style="width:15%">版本</th>
+            <th>说明</th>
+            <th style="width:18%">文件名</th>
+            <th style="width:100px">大小</th>
+            <th style="width:90px">操作</th>
+          </tr>
+        </thead>
+        <tbody id="tbody">
+          <tr><td colspan="6" class="empty">加载中…</td></tr>
+        </tbody>
+      </table>
     </div>
+  </div>
 
-    <div class="card">
-      <h2>已发布固件</h2>
-      <div id="fwList"><div class="empty">选择产品后显示</div></div>
+  <div class="modal-mask" id="modal">
+    <div class="modal">
+      <h3>添加固件</h3>
+      <div class="field">
+        <label>所属产品</label>
+        <select id="product"></select>
+      </div>
+      <div class="field">
+        <label>版本号（如 v1.0.0）</label>
+        <input id="version" placeholder="v1.0.0">
+      </div>
+      <div class="field">
+        <label>说明</label>
+        <textarea id="desc" placeholder="本次更新内容"></textarea>
+      </div>
+      <div class="field">
+        <label>固件文件（.zip，不超过 20MB）</label>
+        <button type="button" class="upload-btn" id="fileBtn">📦 选择 zip 文件</button>
+        <input type="file" id="fileInput" accept=".zip,.bin,.hex" style="display:none">
+        <div class="file-info" id="fileInfo"></div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-ghost" id="cancelBtn">取消</button>
+        <button class="btn btn-primary" id="saveBtn">上传并保存</button>
+      </div>
+      <div class="msg" id="modalMsg"></div>
     </div>
   </div>
 
 <script>
-const productSel = document.getElementById("productSel");
-const fwList = document.getElementById("fwList");
-const msg = document.getElementById("msg");
+const tbody = document.getElementById("tbody");
+const modal = document.getElementById("modal");
+const productEl = document.getElementById("product");
+const versionEl = document.getElementById("version");
+const descEl = document.getElementById("desc");
+const fileInput = document.getElementById("fileInput");
+const fileBtn = document.getElementById("fileBtn");
+const fileInfo = document.getElementById("fileInfo");
+const modalMsg = document.getElementById("modalMsg");
+
+let allItems = [];
+let allFirmwares = [];
+let pickedFile = null;
 
 function escapeHtml(s) {
   return String(s == null ? "" : s).replace(/[&<>"']/g, c => ({
@@ -105,116 +151,160 @@ function formatSize(bytes) {
   if (!bytes) return "";
   if (bytes < 1024) return bytes + " B";
   if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + " KB";
-  return (bytes / 1024 / 1024).toFixed(1) + " MB";
+  return (bytes / 1024 / 1024).toFixed(2) + " MB";
 }
 
-async function loadProducts() {
-  const res = await fetch("/api/items?t=" + Date.now(), { cache: "no-store" });
-  const data = await res.json();
-  const items = data.items || [];
-  productSel.innerHTML = items.map(it =>
-    `<option value="${it.id}">${escapeHtml(it.name)}</option>`
-  ).join("");
-  if (items.length) loadFirmwares();
-  else fwList.innerHTML = '<div class="empty">还没有产品，先去"数据管理"添加</div>';
+async function loadAll() {
+  try {
+    const [itemsRes, fwRes] = await Promise.all([
+      fetch("/api/items?t=" + Date.now(), { cache: "no-store", credentials: "include" }),
+      fetch("/api/firmwares-all?t=" + Date.now(), { cache: "no-store", credentials: "include" })
+    ]);
+    if (itemsRes.status === 401) { location.href = "/login"; return; }
+    const itemsData = await itemsRes.json();
+    allItems = itemsData.items || [];
+    const fwData = fwRes.ok ? await fwRes.json() : { firmwares: [] };
+    allFirmwares = fwData.firmwares || [];
+    render();
+  } catch {
+    tbody.innerHTML = '<tr><td colspan="6" class="empty">加载失败</td></tr>';
+  }
 }
 
-async function loadFirmwares() {
-  const pid = productSel.value;
-  if (!pid) { fwList.innerHTML = '<div class="empty">未选择产品</div>'; return; }
-  fwList.innerHTML = '<div class="empty">加载中…</div>';
-  const res = await fetch("/api/firmwares?product_id=" + pid + "&t=" + Date.now(), { cache: "no-store" });
-  const data = await res.json();
-  const list = data.firmwares || [];
-  if (!list.length) {
-    fwList.innerHTML = '<div class="empty">该产品暂无固件</div>';
+function render() {
+  if (!allFirmwares.length) {
+    tbody.innerHTML = '<tr><td colspan="6" class="empty">还没有固件，点右上角「添加固件」</td></tr>';
     return;
   }
-  fwList.innerHTML = list.map(f => `
-    <div class="fw-item">
-      <div class="fw-info">
-        <div class="fw-version">${escapeHtml(f.version)}</div>
-        <div class="fw-desc">${escapeHtml(f.description || "")}</div>
-        <div class="fw-meta">${escapeHtml(f.file_name)}${f.file_size ? " · " + formatSize(f.file_size) : ""}</div>
-      </div>
-      <button class="mini-del" data-del="${f.id}">删除</button>
-    </div>
+  const productMap = {};
+  allItems.forEach(it => { productMap[it.id] = it.name; });
+  tbody.innerHTML = allFirmwares.map(f => `
+    <tr>
+      <td>${escapeHtml(productMap[f.product_id] || ("#" + f.product_id))}</td>
+      <td style="color:#4fc3f7;">${escapeHtml(f.version)}</td>
+      <td style="color:#b8c6dc;">${escapeHtml(f.description || "")}</td>
+      <td style="font-size:12px; color:#7a8ba8;">${escapeHtml(f.file_name)}</td>
+      <td style="font-size:12px; color:#7a8ba8;">${formatSize(f.file_size)}</td>
+      <td><button class="mini mini-del" data-del="${f.id}">删除</button></td>
+    </tr>
   `).join("");
 }
 
-fwList.addEventListener("click", async (e) => {
-  const id = e.target.dataset.del;
-  if (!id) return;
-  if (!confirm("确定删除此固件？会同时从 GitHub 删除文件。")) return;
-  const res = await fetch("/api/firmwares/" + id + "?t=" + Date.now(), {
-    method: "DELETE", credentials: "include"
-  });
-  const d = await res.json();
-  if (d.success) {
-    loadFirmwares();
-  } else alert(d.error || "删除失败");
+function openModal() {
+  modalMsg.textContent = "";
+  versionEl.value = "";
+  descEl.value = "";
+  pickedFile = null;
+  fileInfo.textContent = "";
+  fileInput.value = "";
+  productEl.innerHTML = allItems.map(it =>
+    `<option value="${it.id}">${escapeHtml(it.name)}</option>`
+  ).join("");
+  if (!allItems.length) {
+    productEl.innerHTML = '<option value="">（请先添加产品）</option>';
+  }
+  modal.classList.add("show");
+}
+function closeModal() { modal.classList.remove("show"); }
+
+fileBtn.onclick = () => fileInput.click();
+fileInput.addEventListener("change", () => {
+  const f = fileInput.files[0];
+  if (!f) return;
+  pickedFile = f;
+  fileInfo.textContent = `已选择：${f.name}（${formatSize(f.size)}）`;
 });
 
-document.getElementById("uploadBtn").onclick = async () => {
-  const fileInput = document.getElementById("fileInput");
-  const version = document.getElementById("version").value.trim();
-  const description = document.getElementById("description").value.trim();
-  const pid = productSel.value;
+async function fileToBase64(file) {
+  return new Promise((res, rej) => {
+    const r = new FileReader();
+    r.onload = () => {
+      const s = r.result;
+      res(s.split(",")[1] || "");
+    };
+    r.onerror = rej;
+    r.readAsDataURL(file);
+  });
+}
 
-  msg.style.color = "#ff8f8f";
-  if (!pid) { msg.textContent = "请先选择产品"; return; }
-  if (!version) { msg.textContent = "请填写版本号"; return; }
-  if (!fileInput.files.length) { msg.textContent = "请选择 zip 文件"; return; }
+tbody.addEventListener("click", async (e) => {
+  const id = e.target.dataset.del;
+  if (!id) return;
+  if (!confirm("确定删除这条固件记录吗？（不会删 GitHub 上的文件）")) return;
+  const res = await fetch("/api/firmwares/" + id, { method: "DELETE", credentials: "include" });
+  const d = await res.json();
+  if (d.success) loadAll();
+  else alert(d.error || "删除失败");
+});
 
-  const file = fileInput.files[0];
-  if (!file.name.toLowerCase().endsWith(".zip")) {
-    msg.textContent = "只允许 .zip 文件"; return;
-  }
+document.getElementById("addBtn").onclick = openModal;
+document.getElementById("cancelBtn").onclick = closeModal;
+modal.addEventListener("click", (e) => { if (e.target === modal) closeModal(); });
 
-  const fd = new FormData();
-  fd.append("file", file);
-  fd.append("product_id", pid);
-  fd.append("version", version);
-  fd.append("description", description);
+document.getElementById("saveBtn").onclick = async () => {
+  const productId = productEl.value;
+  const version = versionEl.value.trim();
+  const description = descEl.value;
 
-  msg.style.color = "#7a8ba8";
-  msg.textContent = "上传中，请稍候…";
+  if (!productId) { modalMsg.style.color="#ff8f8f"; modalMsg.textContent="请选择产品"; return; }
+  if (!version) { modalMsg.style.color="#ff8f8f"; modalMsg.textContent="请填写版本号"; return; }
+  if (!pickedFile) { modalMsg.style.color="#ff8f8f"; modalMsg.textContent="请选择固件文件"; return; }
+
+  const saveBtn = document.getElementById("saveBtn");
+  saveBtn.disabled = true;
+  const orig = saveBtn.textContent;
+  saveBtn.innerHTML = '<span class="spinner"></span>上传中…';
+  modalMsg.textContent = "";
 
   try {
-    const res = await fetch("/api/firmwares/upload", {
+    // 1. 上传文件到 GitHub
+    const base64 = await fileToBase64(pickedFile);
+    modalMsg.style.color = "#7a8ba8";
+    modalMsg.textContent = "上传文件到 GitHub…";
+    const upRes = await fetch("/api/upload-firmware", {
       method: "POST",
+      headers: { "Content-Type": "application/json" },
       credentials: "include",
-      body: fd
+      body: JSON.stringify({ name: pickedFile.name, data: base64 })
     });
-    const text = await res.text();
-    let d;
-    try { d = JSON.parse(text); } catch { d = { error: "服务器异常（HTTP " + res.status + "）" }; }
+    const upD = await upRes.json();
+    if (!upD.success) throw new Error(upD.error || "文件上传失败");
 
-    if (res.ok && d.success) {
-      msg.style.color = "#8affa8";
-      msg.textContent = "✓ 上传成功！1-2 分钟后可在产品页下载";
-      fileInput.value = "";
-      document.getElementById("version").value = "";
-      document.getElementById("description").value = "";
-      loadFirmwares();
-    } else {
-      msg.style.color = "#ff8f8f";
-      msg.textContent = d.error || "上传失败";
-    }
-  } catch (err) {
-    msg.style.color = "#ff8f8f";
-    msg.textContent = "网络错误：" + err.message;
+    // 2. 存数据库
+    modalMsg.textContent = "写入数据库…";
+    const dbRes = await fetch("/api/firmwares", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify({
+        product_id: productId,
+        version,
+        description,
+        file_name: upD.file_name,
+        file_size: upD.file_size
+      })
+    });
+    const dbD = await dbRes.json();
+    if (!dbD.success) throw new Error(dbD.error || "保存失败");
+
+    modalMsg.style.color = "#8affa8";
+    modalMsg.textContent = "✓ 上传成功！约 1-2 分钟后可在产品页下载";
+    setTimeout(() => { closeModal(); loadAll(); }, 1200);
+  } catch (e) {
+    modalMsg.style.color = "#ff8f8f";
+    modalMsg.textContent = "✗ " + e.message;
+  } finally {
+    saveBtn.disabled = false;
+    saveBtn.textContent = orig;
   }
 };
-
-productSel.addEventListener("change", loadFirmwares);
 
 document.getElementById("logout").onclick = async () => {
   await fetch("/api/auth/logout", { method: "POST", credentials: "include" });
   location.href = "/login";
 };
 
-loadProducts();
+loadAll();
 </script>
 </body>
 </html>

@@ -1,0 +1,4 @@
+cd /d E:\MY\HTML\givera-website\public
+mkdir firmwares
+cd firmwares
+echo. > .gitkeep
