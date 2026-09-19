@@ -1,6 +1,7 @@
 @echo off
+chcp 65001 >nul
 cd /d E:\MY\HTML\givera-website
-git pull --rebase origin main
+git pull --rebase --autostash origin main
 git add .
 git commit -m "更新 %date% %time%"
 git push
