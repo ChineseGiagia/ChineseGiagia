@@ -230,12 +230,16 @@ async function fileToBase64(file) {
 tbody.addEventListener("click", async (e) => {
   const id = e.target.dataset.del;
   if (!id) return;
-  if (!confirm("确定删除这条固件记录吗？（不会删 GitHub 上的文件）")) return;
+  if (!confirm("确定删除这条固件吗？会同时删除 GitHub 上的文件。")) return;
   const res = await fetch("/api/firmwares/" + id, { method: "DELETE", credentials: "include" });
   const d = await res.json();
-  if (d.success) loadAll();
-  else alert(d.error || "删除失败");
-});
+if (d.success) {
+  if (d.gh_error) {
+    alert("数据库记录已删除，但 GitHub 文件删除失败：" + d.gh_error + "\n请手动去 GitHub 删。");
+  }
+  loadAll();
+}
+else alert(d.error || "删除失败");
 
 document.getElementById("addBtn").onclick = openModal;
 document.getElementById("cancelBtn").onclick = closeModal;
