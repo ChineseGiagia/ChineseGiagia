@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>固件管理 · Givera</title>
+<style>
+* { box-sizing: border-box; }
+body { margin:0; padding:30px 20px; font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;
+  background: radial-gradient(ellipse at bottom, #1b2a4e 0%, #0a0e1a 70%); color:#e8eef7; min-height:100vh; }
+.wrap { max-width: 900px; margin: 0 auto; }
+header { display:flex; justify-content:space-between; align-items:center; margin-bottom:24px; flex-wrap:wrap; gap:12px; }
+h1 { font-weight: normal; letter-spacing: 3px; font-size: 22px; color:#4fc3f7; margin:0; }
+.actions { display:flex; gap:10px; }
+.btn { padding:10px 20px; border-radius:30px; border:none; cursor:pointer; font-size:14px;
+  letter-spacing:1px; transition: transform 0.15s; font-family:inherit; text-decoration:none; }
+.btn:hover { transform: scale(1.03); }
+.btn-primary { background: linear-gradient(135deg,#4fc3f7,#7c9cff); color:#0a0e1a; font-weight:bold;
+  box-shadow: 0 0 20px rgba(80,160,255,0.35); }
+.btn-ghost { background: transparent; color:#7c9cff; border:1px solid rgba(80,160,255,0.4); }
+
+.card { background: rgba(20,32,56,0.75); border:1px solid rgba(80,160,255,0.2);
+  border-radius: 16px; padding: 24px; backdrop-filter: blur(10px); margin-bottom: 22px; }
+.card h2 { font-weight: normal; color: #4fc3f7; font-size: 16px; letter-spacing: 2px;
+  margin: 0 0 18px; padding-bottom: 10px; border-bottom: 1px solid rgba(80,160,255,0.2); }
+
+label { display:block; font-size:13px; color:#7a8ba8; margin-bottom:6px; letter-spacing:1px; }
+input, select, textarea { width:100%; padding:10px 12px; font-family:inherit; font-size:14px;
+  background: rgba(10,14,26,0.8); border:1px solid rgba(80,160,255,0.25);
+  border-radius:10px; color:#e8eef7; outline:none; transition:border 0.2s; margin-bottom:14px; }
+input:focus, select:focus, textarea:focus { border-color:#4fc3f7; }
+textarea { min-height: 70px; resize: vertical; }
+select option { background: #131c30; }
+
+.file-row { display:flex; gap:10px; align-items:center; margin-bottom:14px; }
+.file-row input[type="file"] { flex:1; padding: 8px 10px; margin-bottom:0; }
+.file-hint { font-size: 12px; color: #7a8ba8; }
+
+.msg { font-size: 13px; margin-top: 8px; min-height: 18px; text-align: right; }
+
+.fw-item { display:flex; justify-content:space-between; align-items:center;
+  padding: 14px 18px; background: rgba(30,48,80,0.5); border-radius: 12px;
+  border-left: 3px solid #4fc3f7; margin-bottom: 10px; gap: 16px; flex-wrap: wrap; }
+.fw-info { flex: 1; min-width: 200px; }
+.fw-version { font-size: 15px; color:#e8eef7; font-weight: 500; margin-bottom: 4px; }
+.fw-desc { font-size: 13px; color:#b8c6dc; line-height: 1.6; }
+.fw-meta { font-size: 12px; color:#7a8ba8; margin-top: 4px; word-break: break-all; }
+.mini-del { padding:6px 14px; font-size:13px; border-radius:20px; cursor:pointer; font-family:inherit;
+  background: rgba(255,80,80,0.1); color:#ff8f8f; border:1px solid rgba(255,80,80,0.3); transition: all 0.2s; }
+.mini-del:hover { background: rgba(255,80,80,0.25); }
+
+.empty { text-align:center; padding: 30px; color: #7a8ba8; font-size: 14px; }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <h1>固件管理</h1>
+      <div class="actions">
+        <a class="btn btn-ghost" href="/admin/">← 返回数据管理</a>
+        <button class="btn btn-ghost" id="logout">退出</button>
+      </div>
+    </header>
+
+    <div class="card">
+      <h2>上传新固件</h2>
+      <label>选择产品</label>
+      <select id="productSel"></select>
+
+      <label>版本号</label>
+      <input id="version" placeholder="例如 v1.0.0">
+
+      <label>更新说明</label>
+      <textarea id="description" placeholder="例如：修复了闹钟不响的问题"></textarea>
+
+      <label>固件文件（.zip）</label>
+      <div class="file-row">
+        <input type="file" id="fileInput" accept=".zip">
+      </div>
+      <div class="file-hint">文件大小建议不超过 20MB</div>
+
+      <div class="msg" id="msg"></div>
+      <div style="text-align:right; margin-top:12px;">
+        <button class="btn btn-primary" id="uploadBtn">上传固件</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>已发布固件</h2>
+      <div id="fwList"><div class="empty">选择产品后显示</div></div>
+    </div>
+  </div>
+
+<script>
+const productSel = document.getElementById("productSel");
+const fwList = document.getElementById("fwList");
+const msg = document.getElementById("msg");
+
+function escapeHtml(s) {
+  return String(s == null ? "" : s).replace(/[&<>"']/g, c => ({
+    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+  }[c]));
+}
+function formatSize(bytes) {
+  if (!bytes) return "";
+  if (bytes < 1024) return bytes + " B";
+  if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + " KB";
+  return (bytes / 1024 / 1024).toFixed(1) + " MB";
+}
+
+async function loadProducts() {
+  const res = await fetch("/api/items?t=" + Date.now(), { cache: "no-store" });
+  const data = await res.json();
+  const items = data.items || [];
+  productSel.innerHTML = items.map(it =>
+    `<option value="${it.id}">${escapeHtml(it.name)}</option>`
+  ).join("");
+  if (items.length) loadFirmwares();
+  else fwList.innerHTML = '<div class="empty">还没有产品，先去"数据管理"添加</div>';
+}
+
+async function loadFirmwares() {
+  const pid = productSel.value;
+  if (!pid) { fwList.innerHTML = '<div class="empty">未选择产品</div>'; return; }
+  fwList.innerHTML = '<div class="empty">加载中…</div>';
+  const res = await fetch("/api/firmwares?product_id=" + pid + "&t=" + Date.now(), { cache: "no-store" });
+  const data = await res.json();
+  const list = data.firmwares || [];
+  if (!list.length) {
+    fwList.innerHTML = '<div class="empty">该产品暂无固件</div>';
+    return;
+  }
+  fwList.innerHTML = list.map(f => `
+    <div class="fw-item">
+      <div class="fw-info">
+        <div class="fw-version">${escapeHtml(f.version)}</div>
+        <div class="fw-desc">${escapeHtml(f.description || "")}</div>
+        <div class="fw-meta">${escapeHtml(f.file_name)}${f.file_size ? " · " + formatSize(f.file_size) : ""}</div>
+      </div>
+      <button class="mini-del" data-del="${f.id}">删除</button>
+    </div>
+  `).join("");
+}
+
+fwList.addEventListener("click", async (e) => {
+  const id = e.target.dataset.del;
+  if (!id) return;
+  if (!confirm("确定删除此固件？会同时从 GitHub 删除文件。")) return;
+  const res = await fetch("/api/firmwares/" + id + "?t=" + Date.now(), {
+    method: "DELETE", credentials: "include"
+  });
+  const d = await res.json();
+  if (d.success) {
+    loadFirmwares();
+  } else alert(d.error || "删除失败");
+});
+
+document.getElementById("uploadBtn").onclick = async () => {
+  const fileInput = document.getElementById("fileInput");
+  const version = document.getElementById("version").value.trim();
+  const description = document.getElementById("description").value.trim();
+  const pid = productSel.value;
+
+  msg.style.color = "#ff8f8f";
+  if (!pid) { msg.textContent = "请先选择产品"; return; }
+  if (!version) { msg.textContent = "请填写版本号"; return; }
+  if (!fileInput.files.length) { msg.textContent = "请选择 zip 文件"; return; }
+
+  const file = fileInput.files[0];
+  if (!file.name.toLowerCase().endsWith(".zip")) {
+    msg.textContent = "只允许 .zip 文件"; return;
+  }
+
+  const fd = new FormData();
+  fd.append("file", file);
+  fd.append("product_id", pid);
+  fd.append("version", version);
+  fd.append("description", description);
+
+  msg.style.color = "#7a8ba8";
+  msg.textContent = "上传中，请稍候…";
+
+  try {
+    const res = await fetch("/api/firmwares/upload", {
+      method: "POST",
+      credentials: "include",
+      body: fd
+    });
+    const text = await res.text();
+    let d;
+    try { d = JSON.parse(text); } catch { d = { error: "服务器异常（HTTP " + res.status + "）" }; }
+
+    if (res.ok && d.success) {
+      msg.style.color = "#8affa8";
+      msg.textContent = "✓ 上传成功！1-2 分钟后可在产品页下载";
+      fileInput.value = "";
+      document.getElementById("version").value = "";
+      document.getElementById("description").value = "";
+      loadFirmwares();
+    } else {
+      msg.style.color = "#ff8f8f";
+      msg.textContent = d.error || "上传失败";
+    }
+  } catch (err) {
+    msg.style.color = "#ff8f8f";
+    msg.textContent = "网络错误：" + err.message;
+  }
+};
+
+productSel.addEventListener("change", loadFirmwares);
+
+document.getElementById("logout").onclick = async () => {
+  await fetch("/api/auth/logout", { method: "POST", credentials: "include" });
+  location.href = "/login";
+};
+
+loadProducts();
+</script>
+</body>
+</html>
