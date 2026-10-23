@@ -147,7 +147,7 @@ function renderDetail(text) {
   return out.join('');
 }
 
-(async () => {
+async function load() {
   const content = document.getElementById("content");
   const id = new URLSearchParams(location.search).get("id");
   if (!id) { content.innerHTML = '<div class="loading">缺少产品 ID</div>'; return; }
@@ -162,7 +162,8 @@ function renderDetail(text) {
     const firmwares = fwData.firmwares || [];
 
     if (item.error) { content.innerHTML = '<div class="loading">产品不存在</div>'; return; }
-    document.title = item.name + " · Givera 嘉雅科技";
+    const loc = window.I18N ? window.I18N.localize(item) : item;
+    document.title = loc.name + " · Givera 嘉雅科技";
 
     // 相册
     let gallery = [];
@@ -187,7 +188,7 @@ function renderDetail(text) {
       `).join("")
       : '<div class="empty">暂无固件发布</div>';
 
-    const detailHtml = renderDetail(item.content || item.description || "");
+    const detailHtml = renderDetail(loc.content || loc.description || "");
 
     content.innerHTML = `
       <div class="hero">
@@ -195,8 +196,8 @@ function renderDetail(text) {
           ? `<img class="hero-img" src="${escapeHtml(item.image_url)}" alt=""
                onerror="this.outerHTML='<div class=\\'hero-img placeholder\\'>📦</div>'">`
           : '<div class="hero-img placeholder">📦</div>'}
-        <h1 class="hero-title">${escapeHtml(item.name)}</h1>
-        ${item.description ? `<p class="hero-sub">${escapeHtml(item.description)}</p>` : ""}
+        <h1 class="hero-title">${escapeHtml(loc.name)}</h1>
+        ${loc.description ? `<p class="hero-sub">${escapeHtml(loc.description)}</p>` : ""}
       </div>
 
       <div class="section">
@@ -229,7 +230,16 @@ function renderDetail(text) {
   } catch (e) {
     content.innerHTML = '<div class="loading">加载失败，请刷新重试</div>';
   }
-})();
+}
+load();
+// i18n 启动时也会派发 givera:lang：中文下无需重新请求，其余语言需要按译文重渲染
+let langInited = false;
+document.addEventListener("givera:lang", () => {
+  if (!langInited && (!window.I18N || window.I18N.lang === "zh")) { langInited = true; return; }
+  langInited = true;
+  load();
+});
+
 </script>
 <script src="/i18n.js"></script>
 </body>

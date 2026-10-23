@@ -62,34 +62,40 @@ function escapeHtml(s) {
 
 (async () => {
   const grid = document.getElementById("grid");
-  try {
-    const res = await fetch("/api/items?t=" + Date.now(), { cache: "no-store" });
-    const data = await res.json();
-    const items = data.items || [];
+  let items = [];
 
+  function card(raw) {
+    const it = window.I18N ? window.I18N.localize(raw) : raw;
+    const thumb = raw.image_url
+      ? '<img class="thumb" src="' + escapeHtml(raw.image_url) + '" alt="" onerror="this.style.display=\'none\'">'
+      : '<div class="thumb placeholder">📦</div>';
+    return '<a class="card" href="/product?id=' + raw.id + '">' + thumb +
+      '<div class="body">' +
+      '<h3 class="name">' + escapeHtml(it.name) + '</h3>' +
+      '<p class="desc">' + escapeHtml(it.description || "") + '</p>' +
+      '<div class="arrow">查看详情 →</div>' +
+      '</div></a>';
+  }
+
+  function render() {
     if (!items.length) {
       grid.innerHTML = '<div class="empty">暂无产品</div>';
       return;
     }
+    grid.innerHTML = items.map(card).join("");
+  }
 
-    grid.innerHTML = items.map(it => `
-      <a class="card" href="/product?id=${it.id}">
-        ${it.image_url
-          ? `<img class="thumb" src="${escapeHtml(it.image_url)}" alt=""
-               onerror="this.outerHTML='<div class=\\'thumb placeholder\\'>📦</div>'">`
-          : '<div class="thumb placeholder">📦</div>'}
-        <div class="body">
-          <h3 class="name">${escapeHtml(it.name)}</h3>
-          <p class="desc">${escapeHtml(it.description || "")}</p>
-          <div class="arrow">查看详情 →</div>
-        </div>
-      </a>
-    `).join("");
+  document.addEventListener("givera:lang", () => { if (items.length) render(); });
+
+  try {
+    const res = await fetch("/api/items?t=" + Date.now(), { cache: "no-store" });
+    const data = await res.json();
+    items = data.items || [];
+    render();
   } catch (e) {
     grid.innerHTML = '<div class="empty">加载失败，请刷新重试</div>';
   }
-})();
-</script>
+})();</script>
 <script src="/i18n.js"></script>
 </body>
 </html>

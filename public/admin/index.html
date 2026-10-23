@@ -68,6 +68,12 @@ mark { background: rgba(80,200,255,0.35); color:#e8eef7; padding:0 2px; border-r
 .field input:focus, .field textarea:focus { border-color:#4fc3f7; }
 .field textarea { min-height: 100px; resize: vertical; }
 .field textarea.tall { min-height: 160px; }
+.lang-tabs { display:flex; flex-wrap:wrap; gap:6px; margin:6px 0 10px; }
+.lang-tab { padding:6px 12px; border-radius:20px; font-size:12px; cursor:pointer; font-family:inherit;
+  background: rgba(10,14,26,0.6); color:#8fa6c8; border:1px solid rgba(80,160,255,0.25); transition:all .2s; }
+.lang-tab.active { background: linear-gradient(135deg,#4fc3f7,#7c9cff); color:#0a0e1a; font-weight:bold; border-color:transparent; }
+#trName, #trDesc { margin-bottom:8px; }
+.lang-note { font-size:12px; color:#5f7292; margin-top:8px; letter-spacing:.5px; }
 
 .upload-btn { display:inline-block; padding:8px 16px; font-size:13px; border-radius:10px;
   border:1px dashed rgba(80,160,255,0.5); background: rgba(80,160,255,0.08);
@@ -117,10 +123,12 @@ mark { background: rgba(80,200,255,0.35); color:#e8eef7; padding:0 2px; border-r
         <input class="search" id="search" placeholder="搜索名称或描述…">
         <a class="btn btn-ghost" href="/admin/personal">私人数据</a>
         <a class="btn btn-ghost" href="/admin/firmwares">固件管理</a>
+        <button class="btn btn-ghost" id="trAllBtn">🌐 补全译文</button>
         <button class="btn btn-primary" id="addBtn">+ 添加项目</button>
         <button class="btn btn-ghost" id="logout">退出</button>
       </div>
     </header>
+    <div class="msg" id="trAllMsg" style="color:#7a8ba8;margin:-10px 0 14px;font-size:13px;"></div>
 
     <div class="card">
       <table>
@@ -157,6 +165,16 @@ mark { background: rgba(80,200,255,0.35); color:#e8eef7; padding:0 2px; border-r
       <div class="field">
         <label>详细内容（产品详情页显示）</label>
         <textarea id="content" class="tall" placeholder="## 硬件参数&#10;主控芯片：ESP32-S3&#10;&#10;## 功能特性&#10;- 时间显示：..."></textarea>
+      </div>
+
+      <div class="field">
+        <label>多语言内容（自动翻译）</label>
+        <button type="button" class="upload-btn" id="trAutoBtn">🌐 自动翻译全部语言</button>
+        <div class="lang-tabs" id="trTabs"></div>
+        <input id="trName" placeholder="名称">
+        <textarea id="trDesc" placeholder="描述"></textarea>
+        <textarea id="trContent" class="tall" placeholder="详细内容"></textarea>
+        <div class="lang-note">留空则显示中文原文</div>
       </div>
 
       <div class="field">
@@ -199,10 +217,64 @@ const galleryInput = document.getElementById("galleryInput");
 const galleryBtn = document.getElementById("galleryBtn");
 const galleryGrid = document.getElementById("galleryGrid");
 const modalMsg = document.getElementById("modalMsg");
+const trTabs = document.getElementById("trTabs");
+const trName = document.getElementById("trName");
+const trDesc = document.getElementById("trDesc");
+const trContent = document.getElementById("trContent");
+const trAutoBtn = document.getElementById("trAutoBtn");
 
 let allItems = [];
 let currentCoverUrl = "";
 let currentGallery = [];
+
+const TR_LANGS = [
+  ["zh-Hant", "繁體中文"], ["en", "English"], ["ja", "日本語"], ["ko", "한국어"],
+  ["ru", "Русский"], ["de", "Deutsch"], ["fr", "Français"], ["es", "Español"]
+];
+let trData = {};
+let trActive = "en";
+
+function renderTrTabs() {
+  trTabs.innerHTML = TR_LANGS.map(([code, label]) =>
+    '<button type="button" class="lang-tab' + (code === trActive ? " active" : "") +
+    '" data-lang="' + code + '">' + label + "</button>"
+  ).join("");
+}
+function fillTrInputs() {
+  const t = trData[trActive] || {};
+  trName.value = t.name || "";
+  trDesc.value = t.description || "";
+  trContent.value = t.content || "";
+}
+function storeTrInputs() {
+  const entry = {
+    name: trName.value.trim(),
+    description: trDesc.value.trim(),
+    content: trContent.value.trim()
+  };
+  if (entry.name || entry.description || entry.content) trData[trActive] = entry;
+  else delete trData[trActive];
+}
+function pickTrLang(code) {
+  storeTrInputs();
+  trActive = code;
+  renderTrTabs();
+  fillTrInputs();
+}
+trTabs.addEventListener("click", (e) => {
+  const btn = e.target.closest(".lang-tab");
+  if (btn) pickTrLang(btn.dataset.lang);
+});
+function loadTrData(item) {
+  trData = {};
+  try {
+    trData = item && item.i18n ? (typeof item.i18n === "string" ? JSON.parse(item.i18n) : item.i18n) : {};
+  } catch (e) { trData = {}; }
+  if (!trData || typeof trData !== "object") trData = {};
+  trActive = "en";
+  renderTrTabs();
+  fillTrInputs();
+}
 
 // ===== 图片压缩 =====
 function compressImage(file, maxSize = 1400, quality = 0.82) {
@@ -323,6 +395,7 @@ searchInput.addEventListener("input", render);
 
 // ===== 打开/关闭弹窗 =====
 function openModal(item) {
+  loadTrData(item);
   modalMsg.textContent = "";
   modalMsg.style.color = "#8affa8";
   if (item) {
@@ -469,18 +542,120 @@ tbody.addEventListener("click", async (e) => {
   }
 });
 
+const TR_ALL_LANGS = ["zh-Hant", "en", "ja", "ko", "ru", "de", "fr", "es"];
+
+trAutoBtn.onclick = async () => {
+  const name = nameEl.value.trim();
+  const desc = descEl.value;
+  const content = contentEl.value;
+  if (!name && !desc.trim() && !content.trim()) {
+    modalMsg.style.color = "#ff8f8f";
+    modalMsg.textContent = "先填写中文内容再翻译";
+    return;
+  }
+  const orig = trAutoBtn.textContent;
+  trAutoBtn.disabled = true;
+  trAutoBtn.textContent = "🌐 翻译中…";
+  modalMsg.style.color = "#7a8ba8";
+  modalMsg.textContent = "正在自动翻译 8 种语言…";
+  try {
+    const res = await fetch("/api/translate", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify({ name, description: desc, content })
+    });
+    const d = await res.json();
+    if (!res.ok || !d.success) throw new Error(d.error || ("HTTP " + res.status));
+    const langs = Object.keys(d.translations || {});
+    if (!langs.length) throw new Error("没有返回译文");
+    trData = Object.assign({}, trData, d.translations);
+    renderTrTabs();
+    fillTrInputs();
+    modalMsg.style.color = "#8affa8";
+    modalMsg.textContent = "✓ 已翻译 " + langs.length + " 种语言（可切 Tab 微调）";
+  } catch (e) {
+    modalMsg.style.color = "#ff8f8f";
+    modalMsg.textContent = "自动翻译失败：" + e.message;
+  } finally {
+    trAutoBtn.disabled = false;
+    trAutoBtn.textContent = orig;
+  }
+};
+
+document.getElementById("trAllBtn").onclick = async () => {
+  const btn = document.getElementById("trAllBtn");
+  const msg = document.getElementById("trAllMsg");
+  if (!confirm("给所有还没有译文的项目自动翻译？每个项目约需几秒。")) return;
+  btn.disabled = true;
+  let done = 0, skip = 0, fail = 0;
+  try {
+    for (const row of allItems) {
+      msg.textContent = "处理中… 已翻译 " + done + "，跳过 " + skip + "，失败 " + fail;
+      let full;
+      try {
+        const r = await fetch("/api/items/" + row.id + "?t=" + Date.now(), { cache: "no-store", credentials: "include" });
+        full = await r.json();
+      } catch (e) { fail++; continue; }
+      if (!full || full.error) { fail++; continue; }
+
+      let has = {};
+      try { has = full.i18n ? JSON.parse(full.i18n) : {}; } catch (e) { has = {}; }
+      const need = TR_ALL_LANGS.filter(l => !has[l] || !has[l].name);
+      if (!need.length) { skip++; continue; }
+
+      try {
+        const trRes = await fetch("/api/translate", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify({ name: full.name, description: full.description, content: full.content, langs: need })
+        });
+        const tr = await trRes.json();
+        if (!trRes.ok || !tr.success) { fail++; continue; }
+
+        let gallery = [];
+        try { gallery = full.gallery ? JSON.parse(full.gallery) : []; } catch (e) { gallery = []; }
+
+        const putRes = await fetch("/api/items/" + row.id, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify({
+            name: full.name,
+            description: full.description,
+            content: full.content,
+            image_url: full.image_url || "",
+            gallery,
+            i18n: Object.assign({}, has, tr.translations || {})
+          })
+        });
+        if (putRes.ok) done++; else fail++;
+      } catch (e) { fail++; }
+    }
+    msg.textContent = "✓ 完成：翻译 " + done + " 个，已是最新 " + skip + " 个，失败 " + fail + " 个";
+    await loadItems();
+  } finally {
+    btn.disabled = false;
+  }
+};
+
 document.getElementById("addBtn").onclick = () => openModal(null);
 document.getElementById("cancelBtn").onclick = closeModal;
 modal.addEventListener("click", (e) => { if (e.target === modal) closeModal(); });
 
 document.getElementById("saveBtn").onclick = async () => {
   const id = itemIdEl.value;
+  storeTrInputs();
+  const needAuto = Object.keys(trData).length === 0;
   const body = {
     name: nameEl.value.trim(),
     description: descEl.value,
     content: contentEl.value,
     image_url: currentCoverUrl,
-    gallery: currentGallery
+    gallery: currentGallery,
+    i18n: trData,
+    autoTranslate: needAuto
   };
   if (!body.name) {
     modalMsg.style.color = "#ff8f8f";
@@ -505,7 +680,8 @@ document.getElementById("saveBtn").onclick = async () => {
 
     if (res.ok && d.success) {
       modalMsg.style.color = "#8affa8";
-      modalMsg.textContent = "✓ 已保存";
+      modalMsg.textContent = d.translated ? "✓ 已保存，已自动翻译 8 种语言" : "✓ 已保存";
+      await new Promise(r => setTimeout(r, d.translated ? 900 : 250));
       closeModal();
       await loadItems();
     } else {
@@ -523,8 +699,8 @@ document.getElementById("logout").onclick = async () => {
   location.href = "/login";
 };
 
+fetch("/api/admin/migrate", { method: "POST", credentials: "include" }).catch(() => {});
 loadItems();
 </script>
-<script src="/i18n.js"></script>
 </body>
 </html>
