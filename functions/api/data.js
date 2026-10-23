@@ -11,7 +11,7 @@ export async function onRequestGet({ env }) {
 
 export async function onRequestPost({ request, env }) {
   const user = await getSessionUser(request, env);
-  if (!user) return json({ error: "未登录" }, { status: 401 });
+  if (!user || user.role !== "admin") return json({ error: "未登录" }, { status: 401 });
 
   const body = await request.json().catch(() => ({}));
   const entries = Object.entries(body);
