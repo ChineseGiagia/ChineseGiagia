@@ -20,6 +20,19 @@ function decodeEntities(s) {
     .replace(/&nbsp;/g, " ");
 }
 
+// 把 URL 换成占位符，避免机翻擅自改写下载链接
+function protectUrls(text) {
+  const urls = [];
+  const out = String(text).replace(/https?:\/\/[^\s)\]"'<>]+/g, (u) => {
+    urls.push(u);
+    return "[[URL" + (urls.length - 1) + "]]";
+  });
+  return { text: out, urls };
+}
+function restoreUrls(text, urls) {
+  return String(text).replace(/\[\[\s*URL\s*(\d+)\s*\]\]/gi, (m, i) => urls[Number(i)] || m);
+}
+
 // 按行切块，尽量保留原有换行/分段结构
 function chunkLines(text, max = MAX_CHUNK) {
   const lines = String(text).split(/\r?\n/);
@@ -70,14 +83,15 @@ export async function translateText(env, text, lang) {
   const chunks = chunkLines(src);
   const out = [];
   for (const chunk of chunks) {
+    const guarded = protectUrls(chunk);
     let t = "";
     // 繁体优先走 MyMemory 的 zh-TW（繁简转换比字表可靠）
-    if (lang === "zh-Hant") t = await myMemory(chunk, MM[lang]);
+    if (lang === "zh-Hant") t = await myMemory(guarded.text, MM[lang]);
     else {
-      if (env && env.AI) t = await viaAi(env, chunk, lang);
-      if (!t) t = await myMemory(chunk, MM[lang]);
+      if (env && env.AI) t = await viaAi(env, guarded.text, lang);
+      if (!t) t = await myMemory(guarded.text, MM[lang]);
     }
-    out.push(t || chunk);
+    out.push(t ? restoreUrls(t, guarded.urls) : chunk);
   }
   return out.join("\n");
 }

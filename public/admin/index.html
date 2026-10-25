@@ -74,6 +74,15 @@ mark { background: rgba(80,200,255,0.35); color:#e8eef7; padding:0 2px; border-r
 .lang-tab.active { background: linear-gradient(135deg,#4fc3f7,#7c9cff); color:#0a0e1a; font-weight:bold; border-color:transparent; }
 #trName, #trDesc { margin-bottom:8px; }
 .lang-note { font-size:12px; color:#5f7292; margin-top:8px; letter-spacing:.5px; }
+.file-list { display:flex; flex-direction:column; gap:6px; margin-top:10px; }
+.file-item { display:flex; align-items:center; gap:8px; font-size:13px; color:#b8c6dc;
+  background: rgba(10,14,26,0.6); border:1px solid rgba(80,160,255,0.2); border-radius:10px; padding:8px 12px; }
+.file-item .file-name { flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.file-item .file-size { color:#7a8ba8; font-size:12px; }
+.file-del { background:none; border:none; color:#ff8f8f; cursor:pointer; font-size:14px; }
+.file-badge { font-size:11px; color:#0a0e1a; background:#4fc3f7; border-radius:10px; padding:2px 8px; }
+.file-link-row { display:flex; gap:8px; margin-top:10px; }
+.file-link-row input { flex:1; margin:0 !important; }
 
 .upload-btn { display:inline-block; padding:8px 16px; font-size:13px; border-radius:10px;
   border:1px dashed rgba(80,160,255,0.5); background: rgba(80,160,255,0.08);
@@ -192,6 +201,18 @@ mark { background: rgba(80,200,255,0.35); color:#e8eef7; padding:0 2px; border-r
         <div class="gallery-grid" id="galleryGrid"></div>
       </div>
 
+      <div class="field">
+        <label>软件安装包（自动分流：≤20MB 进仓库，更大自动进 Releases）</label>
+        <button type="button" class="upload-btn" id="fileBtn">💾 上传安装包</button>
+        <input type="file" id="fileInput" style="display:none" accept=".exe,.msi,.zip,.7z,.rar,.dmg,.pkg,.apk,.deb,.appimage,.iso">
+        <div class="file-link-row">
+          <input id="fileLink" placeholder="或粘贴外部下载链接（Releases / 网盘直链）">
+          <button type="button" class="upload-btn" id="fileLinkBtn">＋ 添加链接</button>
+        </div>
+        <div class="file-list" id="fileList"></div>
+        <div class="lang-note">经网站中转上传上限 60MB；更大的文件请在 GitHub 手动建 Release，再把链接粘到上面</div>
+      </div>
+
       <div class="modal-actions">
         <button class="btn btn-ghost" id="cancelBtn">取消</button>
         <button class="btn btn-primary" id="saveBtn">保存</button>
@@ -222,10 +243,16 @@ const trName = document.getElementById("trName");
 const trDesc = document.getElementById("trDesc");
 const trContent = document.getElementById("trContent");
 const trAutoBtn = document.getElementById("trAutoBtn");
+const fileBtn = document.getElementById("fileBtn");
+const fileInput = document.getElementById("fileInput");
+const fileList = document.getElementById("fileList");
+const fileLink = document.getElementById("fileLink");
+const fileLinkBtn = document.getElementById("fileLinkBtn");
 
 let allItems = [];
 let currentCoverUrl = "";
 let currentGallery = [];
+let currentFiles = [];
 
 const TR_LANGS = [
   ["zh-Hant", "繁體中文"], ["en", "English"], ["ja", "日本語"], ["ko", "한국어"],
@@ -396,6 +423,13 @@ searchInput.addEventListener("input", render);
 // ===== 打开/关闭弹窗 =====
 function openModal(item) {
   loadTrData(item);
+  currentFiles = [];
+  try {
+    currentFiles = item && item.downloads
+      ? (typeof item.downloads === "string" ? JSON.parse(item.downloads) : item.downloads)
+      : [];
+  } catch (e) { currentFiles = []; }
+  if (!Array.isArray(currentFiles)) currentFiles = [];
   modalMsg.textContent = "";
   modalMsg.style.color = "#8affa8";
   if (item) {
@@ -418,6 +452,7 @@ function openModal(item) {
   }
   updateCoverPreview();
   renderGallery();
+  renderFiles();
   modal.classList.add("show");
   setTimeout(() => nameEl.focus(), 50);
 }
@@ -655,6 +690,7 @@ document.getElementById("saveBtn").onclick = async () => {
     image_url: currentCoverUrl,
     gallery: currentGallery,
     i18n: trData,
+    downloads: currentFiles,
     autoTranslate: needAuto
   };
   if (!body.name) {
@@ -692,6 +728,95 @@ document.getElementById("saveBtn").onclick = async () => {
     modalMsg.style.color = "#ff8f8f";
     modalMsg.textContent = "网络错误：" + err.message;
   }
+};
+
+const TR_REPO_MAX = 20 * 1024 * 1024;
+const TR_UPLOAD_MAX = 60 * 1024 * 1024;
+
+function fmtSize(bytes) {
+  const b = Number(bytes) || 0;
+  if (!b) return "";
+  if (b < 1024) return b + " B";
+  if (b < 1024 * 1024) return (b / 1024).toFixed(1) + " KB";
+  return (b / (1024 * 1024)).toFixed(1) + " MB";
+}
+function renderFiles() {
+  fileList.innerHTML = currentFiles.map((f, i) => {
+    const badge = f.storage === "release" ? "Releases" : (f.storage === "repo" ? "仓库" : "外链");
+    return '<div class="file-item">' +
+      '<span class="file-name">' + escapeHtml(f.name || f.url || "") + '</span>' +
+      '<span class="file-size">' + fmtSize(f.size) + '</span>' +
+      '<span class="file-badge">' + badge + '</span>' +
+      '<button type="button" class="file-del" data-fi="' + i + '">✕</button>' +
+    '</div>';
+  }).join("");
+}
+fileBtn.onclick = () => fileInput.click();
+fileList.addEventListener("click", (e) => {
+  const i = e.target.dataset.fi;
+  if (i == null) return;
+  currentFiles.splice(parseInt(i, 10), 1);
+  renderFiles();
+});
+fileInput.addEventListener("change", async () => {
+  const f = fileInput.files && fileInput.files[0];
+  if (!f) return;
+  if (f.size > TR_UPLOAD_MAX) {
+    modalMsg.style.color = "#ff8f8f";
+    modalMsg.textContent = "文件超过 60MB，请手动上传到 GitHub Releases，再把链接粘到上面的输入框";
+    fileInput.value = "";
+    return;
+  }
+  const orig = fileBtn.textContent;
+  fileBtn.disabled = true;
+  fileBtn.textContent = "💾 上传中…";
+  modalMsg.style.color = "#7a8ba8";
+  modalMsg.textContent = f.size > TR_REPO_MAX
+    ? "正在上传到 Releases（不占站点体积）…"
+    : "正在上传到仓库…";
+  try {
+    const res = await fetch("/api/upload-software?name=" + encodeURIComponent(f.name), {
+      method: "POST",
+      headers: { "Content-Type": "application/octet-stream" },
+      credentials: "include",
+      body: f
+    });
+    let d = {};
+    try { d = await res.json(); } catch (e) { d = {}; }
+    if (!res.ok || !d.success) throw new Error(d.error || ("HTTP " + res.status));
+    currentFiles.push({ name: f.name, url: d.url, size: d.file_size, storage: d.storage });
+    renderFiles();
+    modalMsg.style.color = "#8affa8";
+    modalMsg.textContent = d.storage === "release"
+      ? "✓ 已上传到 Releases，保存后即可下载"
+      : "✓ 已上传到仓库，部署约需 1 分钟";
+  } catch (e) {
+    modalMsg.style.color = "#ff8f8f";
+    modalMsg.textContent = "上传失败：" + e.message;
+  } finally {
+    fileBtn.disabled = false;
+    fileBtn.textContent = orig;
+    fileInput.value = "";
+  }
+});
+
+fileLinkBtn.onclick = () => {
+  const url = (fileLink.value || "").trim();
+  if (!/^https?:\/\//i.test(url)) {
+    modalMsg.style.color = "#ff8f8f";
+    modalMsg.textContent = "请填写以 http:// 或 https:// 开头的链接";
+    return;
+  }
+  let guess = "外部文件";
+  try {
+    const last = url.split("?")[0].split("/").filter(Boolean).pop();
+    if (last) guess = decodeURIComponent(last);
+  } catch (e) { /* 保持默认名 */ }
+  currentFiles.push({ name: guess, url: url, size: 0, storage: "external" });
+  fileLink.value = "";
+  renderFiles();
+  modalMsg.style.color = "#8affa8";
+  modalMsg.textContent = "✓ 已添加外部链接";
 };
 
 document.getElementById("logout").onclick = async () => {

@@ -173,7 +173,8 @@
     "你已成功登录。这里是普通用户中心页面。": "You are signed in. This is your account page.",
     "多语言内容（可选）": "Multilingual content (optional)",
     "留空则显示中文原文": "Leave blank to use the Chinese original",
-    "详细内容": "Details"
+    "详细内容": "Details",
+    "软件下载": "Software downloads"
   },
   "rules": {
     "cooldown": "{1}s",
