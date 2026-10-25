@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>固件管理 · Givera</title>
+<title>资源管理 · Givera</title>
 <style>
 * { box-sizing: border-box; }
 body { margin:0; padding:30px 20px; font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;
@@ -58,11 +58,11 @@ tbody tr:hover td { background: rgba(80,160,255,0.05); }
 <body>
   <div class="wrap">
     <header>
-      <h1>固件管理</h1>
+      <h1>资源管理</h1>
       <div class="toolbar">
         <a class="btn btn-ghost" href="/admin/">← 产品管理</a>
         <a class="btn btn-ghost" href="/admin/personal">私人数据</a>
-        <button class="btn btn-primary" id="addBtn">+ 添加固件</button>
+        <button class="btn btn-primary" id="addBtn">+ 添加资源</button>
         <button class="btn btn-ghost" id="logout">退出</button>
       </div>
     </header>
@@ -87,7 +87,7 @@ tbody tr:hover td { background: rgba(80,160,255,0.05); }
 
   <div class="modal-mask" id="modal">
     <div class="modal">
-      <h3>添加固件</h3>
+      <h3>添加资源</h3>
       <div class="field">
         <label>所属产品</label>
         <select id="product"></select>
@@ -101,9 +101,9 @@ tbody tr:hover td { background: rgba(80,160,255,0.05); }
         <textarea id="desc" placeholder="本次更新内容"></textarea>
       </div>
       <div class="field">
-        <label>固件文件（.zip，不超过 20MB）</label>
-        <button type="button" class="upload-btn" id="fileBtn">📦 选择 zip 文件</button>
-        <input type="file" id="fileInput" accept=".zip,.bin,.hex" style="display:none">
+        <label>资源文件（任意格式；≤20MB 进仓库，更大自动进 Releases）</label>
+        <button type="button" class="upload-btn" id="fileBtn">📦 选择文件</button>
+        <input type="file" id="fileInput" style="display:none">
         <div class="file-info" id="fileInfo"></div>
       </div>
       <div class="modal-actions">
@@ -164,7 +164,7 @@ async function loadAll() {
 
 function render() {
   if (!allFirmwares.length) {
-    tbody.innerHTML = '<tr><td colspan="6" class="empty">还没有固件，点右上角「添加固件」</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="6" class="empty">还没有资源，点右上角「添加资源」</td></tr>';
     return;
   }
   var productMap = {};
@@ -205,7 +205,8 @@ fileInput.addEventListener("change", function() {
   var f = fileInput.files[0];
   if (!f) return;
   pickedFile = f;
-  fileInfo.textContent = "已选择：" + f.name + "（" + formatSize(f.size) + "）";
+  fileInfo.textContent = "已选择：" + f.name + "（" + formatSize(f.size) + "）" +
+    (f.size > 20 * 1024 * 1024 ? " · 将自动上传到 Releases" : " · 将提交进仓库");
 });
 
 function fileToBase64(file) {
@@ -223,7 +224,7 @@ function fileToBase64(file) {
 tbody.addEventListener("click", async function(e) {
   var id = e.target.dataset.del;
   if (!id) return;
-  if (!confirm("确定删除这条固件吗？会同时删除 GitHub 上的文件。")) return;
+  if (!confirm("确定删除这条资源吗？（仓库里的文件会一并删除，Releases 里的需要手动删）")) return;
   var res = await fetch("/api/firmwares/" + id, { method: "DELETE", credentials: "include" });
   var d = await res.json();
   if (d.success) {
@@ -247,7 +248,7 @@ document.getElementById("saveBtn").onclick = async function() {
 
   if (!productId) { modalMsg.style.color="#ff8f8f"; modalMsg.textContent="请选择产品"; return; }
   if (!version) { modalMsg.style.color="#ff8f8f"; modalMsg.textContent="请填写版本号"; return; }
-  if (!pickedFile) { modalMsg.style.color="#ff8f8f"; modalMsg.textContent="请选择固件文件"; return; }
+  if (!pickedFile) { modalMsg.style.color="#ff8f8f"; modalMsg.textContent="请选择文件"; return; }
 
   var saveBtn = document.getElementById("saveBtn");
   saveBtn.disabled = true;
@@ -256,17 +257,18 @@ document.getElementById("saveBtn").onclick = async function() {
   modalMsg.textContent = "";
 
   try {
-    var base64 = await fileToBase64(pickedFile);
     modalMsg.style.color = "#7a8ba8";
-    modalMsg.textContent = "上传文件到 GitHub…";
-    var upRes = await fetch("/api/upload-firmware", {
+    modalMsg.textContent = pickedFile.size > 20 * 1024 * 1024
+      ? "正在上传到 Releases（不占站点体积）…"
+      : "正在上传到仓库…";
+    var upRes = await fetch("/api/upload-software?name=" + encodeURIComponent(pickedFile.name), {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/octet-stream" },
       credentials: "include",
-      body: JSON.stringify({ name: pickedFile.name, data: base64 })
+      body: pickedFile
     });
-    var upD = await upRes.json();
-    if (!upD.success) throw new Error(upD.error || "文件上传失败");
+    var upD = await upRes.json().catch(function() { return {}; });
+    if (!upRes.ok || !upD.success) throw new Error(upD.error || ("文件上传失败（HTTP " + upRes.status + "）"));
 
     modalMsg.textContent = "写入数据库…";
     var dbRes = await fetch("/api/firmwares", {
@@ -277,15 +279,18 @@ document.getElementById("saveBtn").onclick = async function() {
         product_id: productId,
         version: version,
         description: description,
-        file_name: upD.file_name,
-        file_size: upD.file_size
+        file_name: upD.original_name || pickedFile.name,
+        file_size: upD.file_size,
+        url: upD.url
       })
     });
     var dbD = await dbRes.json();
     if (!dbD.success) throw new Error(dbD.error || "保存失败");
 
     modalMsg.style.color = "#8affa8";
-    modalMsg.textContent = "✓ 上传成功！约 1-2 分钟后可在产品页下载";
+    modalMsg.textContent = upD.storage === "release"
+      ? "✓ 已上传到 Releases，保存后即可在产品页下载"
+      : "✓ 已上传，约 1-2 分钟后可在产品页下载";
     setTimeout(function() { closeModal(); loadAll(); }, 1200);
   } catch (e) {
     modalMsg.style.color = "#ff8f8f";

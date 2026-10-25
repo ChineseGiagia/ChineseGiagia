@@ -174,7 +174,10 @@
     "多语言内容（可选）": "Mehrsprachige Inhalte (optional)",
     "留空则显示中文原文": "Leer lassen, um das chinesische Original zu zeigen",
     "详细内容": "Details",
-    "软件下载": "Software-Downloads"
+    "软件下载": "Software-Downloads",
+    "资源下载": "Ressourcen-Downloads",
+    "下载资源": "Herunterladen",
+    "暂无资源": "Noch keine Dateien"
   },
   "rules": {
     "cooldown": "Noch {1} s",

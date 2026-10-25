@@ -8,17 +8,20 @@ export async function onRequestPost({ request, env }) {
   const added = {};
   const errors = [];
 
-  for (const [col, sql] of [
-    ["i18n", "ALTER TABLE items ADD COLUMN i18n TEXT"],
-    ["downloads", "ALTER TABLE items ADD COLUMN downloads TEXT"]
-  ]) {
+  const jobs = [
+    ["items.i18n", "ALTER TABLE items ADD COLUMN i18n TEXT"],
+    ["items.downloads", "ALTER TABLE items ADD COLUMN downloads TEXT"],
+    ["firmwares.url", "ALTER TABLE firmwares ADD COLUMN url TEXT"]
+  ];
+
+  for (const [label, sql] of jobs) {
     try {
       await env.DB.prepare(sql).run();
-      added[col] = true;
+      added[label] = true;
     } catch (e) {
       const msg = String((e && e.message) || e);
-      added[col] = false;
-      if (!/duplicate column|already exists/i.test(msg)) errors.push(`${col}: ${msg}`);
+      added[label] = false;
+      if (!/duplicate column|already exists/i.test(msg)) errors.push(label + ": " + msg);
     }
   }
 
